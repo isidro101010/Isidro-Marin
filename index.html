@@ -178,6 +178,9 @@
         <label for="factura-titulo">Título de la Factura:</label>
         <input type="text" id="factura-titulo" placeholder="Nombre o título de la factura" required aria-required="true">
         
+        <label for="factura-numero">Número de la Factura:</label>
+        <input type="text" id="factura-numero" placeholder="Número de la factura" required aria-required="true">
+
         <label for="factura-monto">Monto:</label>
         <div>
           <input type="number" id="factura-monto" placeholder="Monto total" required aria-required="true">
@@ -241,10 +244,10 @@
     };
 
     // Función para guardar factura
-    const saveInvoice = (title, amount, date) => {
+    const saveInvoice = (title, number, amount, date) => {
       if (loggedIn) {
         const currency = document.getElementById('currency-selector').value;
-        const invoice = { title, amount, currency, date, user: currentUser.email };
+        const invoice = { title, number, amount, currency, date, user: currentUser.email };
         invoices.push(invoice);
         localStorage.setItem('invoices', JSON.stringify(invoices));
         document.getElementById('invoice-success').style.display = 'block';
@@ -263,7 +266,7 @@
       invoices.filter(invoice => invoice.user === currentUser.email).forEach(invoice => {
         const invoiceItem = document.createElement('div');
         invoiceItem.className = 'invoice-item';
-        invoiceItem.innerHTML = `<strong>Título:</strong> ${invoice.title} | <strong>Monto:</strong> ${invoice.amount} ${invoice.currency} | <strong>Fecha:</strong> ${invoice.date}`;
+        invoiceItem.innerHTML = `<strong>Título:</strong> ${invoice.title} | <strong>Número:</strong> ${invoice.number} | <strong>Monto:</strong> ${invoice.amount} ${invoice.currency} | <strong>Fecha:</strong> ${invoice.date}`;
         invoiceList.appendChild(invoiceItem);
       });
     };
@@ -299,9 +302,10 @@
     document.getElementById('invoice-form').addEventListener('submit', (event) => {
       event.preventDefault();
       const title = document.getElementById('factura-titulo').value;
+      const number = document.getElementById('factura-numero').value;
       const amount = document.getElementById('factura-monto').value;
       const date = document.getElementById('factura-fecha').value;
-      saveInvoice(title, amount, date);
+      saveInvoice(title, number, amount, date);
     });
 
     // Hide loading screen after page loads
