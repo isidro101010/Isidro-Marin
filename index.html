@@ -7,67 +7,120 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f8ff;
+            margin: 20px;
+            background-color: #f4f4f9;
             color: #333;
-            margin: 0;
-            padding: 0;
         }
-        header {
-            background-color: #ffa500;
-            padding: 10px;
-            text-align: center;
-            color: white;
-        }
-        .container {
-            padding: 20px;
+        h1 {
+            color: #007BFF;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-bottom: 20px;
         }
         table, th, td {
-            border: 1px solid #ccc;
+            border: 1px solid #ddd;
         }
         th, td {
             padding: 10px;
             text-align: left;
         }
         th {
-            background-color: #add8e6;
+            background-color: #007BFF;
+            color: white;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Gestión de Facturas</h1>
-    </header>
-    <div class="container">
-        <p>Bienvenido a tu página para gestionar facturas.</p>
-        <table>
-            <thead>
-                <tr>
-                    <th>Número de Factura</th>
-                    <th>Fecha</th>
-                    <th>Monto</th>
-                    <th>Descripción</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>001</td>
-                    <td>2024-12-28</td>
-                    <td>$100</td>
-                    <td>Compra de suministros</td>
-                </tr>
-                <tr>
-                    <td>002</td>
-                    <td>2024-12-27</td>
-                    <td>$200</td>
-                    <td>Servicio técnico</td>
-                </tr>
-            </tbody>
-        </table>
+    <h1>Gestión de Facturas</h1>
+    <div>
+        <h2>Registrar Factura</h2>
+        <form id="facturaForm">
+            <input type="text" id="numero" placeholder="Número de Factura" required>
+            <input type="text" id="cliente" placeholder="Cliente" required>
+            <input type="number" id="monto" placeholder="Monto" required>
+            <input type="date" id="fecha" required>
+            <button type="submit">Agregar</button>
+        </form>
     </div>
+
+    <div>
+        <h2>Buscar Factura</h2>
+        <input type="text" id="buscar" placeholder="Buscar por cliente o número...">
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Número</th>
+                <th>Cliente</th>
+                <th>Monto</th>
+                <th>Fecha</th>
+            </tr>
+        </thead>
+        <tbody id="facturaTabla">
+            <!-- Aquí se agregarán las facturas dinámicamente -->
+        </tbody>
+    </table>
+
+    <script>
+        const form = document.getElementById('facturaForm');
+        const tabla = document.getElementById('facturaTabla');
+        const buscar = document.getElementById('buscar');
+
+        let facturas = [];
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const numero = document.getElementById('numero').value;
+            const cliente = document.getElementById('cliente').value;
+            const monto = document.getElementById('monto').value;
+            const fecha = document.getElementById('fecha').value;
+
+            facturas.push({ numero, cliente, monto, fecha });
+            actualizarTabla();
+            form.reset();
+        });
+
+        buscar.addEventListener('input', () => {
+            const filtro = buscar.value.toLowerCase();
+            actualizarTabla(filtro);
+        });
+
+        function actualizarTabla(filtro = '') {
+            tabla.innerHTML = '';
+            facturas
+                .filter(factura => 
+                    factura.numero.toLowerCase().includes(filtro) ||
+                    factura.cliente.toLowerCase().includes(filtro)
+                )
+                .forEach(factura => {
+                    const fila = `
+                        <tr>
+                            <td>${factura.numero}</td>
+                            <td>${factura.cliente}</td>
+                            <td>${factura.monto}</td>
+                            <td>${factura.fecha}</td>
+                        </tr>
+                    `;
+                    tabla.innerHTML += fila;
+                });
+        }
+    </script>
 </body>
 </html>
