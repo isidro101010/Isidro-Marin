@@ -1,148 +1,131 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Facturas</title>
-    <style>
-        /* Reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Facturas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to right, #87CEFA, #FFA07A);
+    }
 
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(120deg, #007BFF, #FFA500);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+    header {
+      background-color: #008CBA;
+      color: white;
+      text-align: center;
+      padding: 1rem 0;
+    }
 
-        /* General Container */
-        .container {
-            width: 90%;
-            max-width: 400px;
-            background: #fff;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            animation: slideIn 0.8s ease-in-out;
-        }
+    h1, h2 {
+      text-align: center;
+    }
 
-        h1 {
-            text-align: center;
-            font-size: 2rem;
-            color: #007BFF;
-            margin-bottom: 1rem;
-        }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
 
-        p {
-            text-align: center;
-            margin-bottom: 1.5rem;
-            color: #555;
-        }
+    .button {
+      background-color: #FFA07A;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
 
-        .form-control {
-            width: 100%;
-            padding: 0.8rem;
-            margin: 0.5rem 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
+    .button:hover {
+      background-color: #FF6347;
+    }
 
-        .button {
-            width: 100%;
-            padding: 0.8rem;
-            margin: 1rem 0;
-            font-size: 1rem;
-            color: white;
-            background: #007BFF;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
 
-        .button:hover {
-            background: #0056b3;
-        }
+    nav {
+      text-align: center;
+      margin-bottom: 20px;
+    }
 
-        .link {
-            text-align: center;
-            display: block;
-            margin-top: 1rem;
-            text-decoration: none;
-            color: #007BFF;
-            font-size: 0.9rem;
-        }
+    nav a {
+      text-decoration: none;
+      color: white;
+      background-color: #008CBA;
+      padding: 10px 20px;
+      margin: 0 5px;
+      border-radius: 5px;
+    }
 
-        .link:hover {
-            text-decoration: underline;
-        }
-
-        /* Animations */
-        @keyframes slideIn {
-            from {
-                transform: translateY(20%);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        /* Hidden sections */
-        .hidden {
-            display: none;
-        }
-    </style>
+    nav a:hover {
+      background-color: #005F73;
+    }
+  </style>
 </head>
 <body>
-    <!-- Home Section -->
-    <div class="container" id="home">
-        <h1>Gestión de Facturas</h1>
-        <p>Gestiona tus facturas fácilmente. Por favor, inicia sesión o crea una cuenta para empezar.</p>
-        <button class="button" onclick="showSection('login')">Iniciar Sesión</button>
-        <button class="button" onclick="showSection('register')">Crear Cuenta</button>
-    </div>
+  <header>
+    <h1>Gestión de Facturas</h1>
+  </header>
 
-    <!-- Login Section -->
-    <div class="container hidden" id="login">
-        <h1>Iniciar Sesión</h1>
-        <form>
-            <input type="text" class="form-control" placeholder="Usuario" required>
-            <input type="password" class="form-control" placeholder="Contraseña" required>
-            <button class="button" type="submit">Entrar</button>
-        </form>
-        <a href="#" class="link" onclick="showSection('home')">Volver al Inicio</a>
-    </div>
+  <nav>
+    <a href="#login">Iniciar Sesión</a>
+    <a href="#register">Registrar</a>
+    <a href="#home">Home</a>
+  </nav>
 
-    <!-- Register Section -->
-    <div class="container hidden" id="register">
-        <h1>Crear Cuenta</h1>
-        <form>
-            <input type="text" class="form-control" placeholder="Usuario" required>
-            <input type="email" class="form-control" placeholder="Correo Electrónico" required>
-            <input type="password" class="form-control" placeholder="Contraseña" required>
-            <button class="button" type="submit">Registrarse</button>
-        </form>
-        <a href="#" class="link" onclick="showSection('home')">Volver al Inicio</a>
-    </div>
+  <section id="login" class="container">
+    <h2>Iniciar Sesión</h2>
+    <form>
+      <label for="email-login">Correo Electrónico:</label>
+      <input type="email" id="email-login" placeholder="Ingresa tu correo">
+      <label for="password-login">Contraseña:</label>
+      <input type="password" id="password-login" placeholder="Ingresa tu contraseña">
+      <button type="button" class="button">Iniciar Sesión</button>
+    </form>
+  </section>
 
-    <script>
-        function showSection(sectionId) {
-            // Ocultar todas las secciones
-            const sections = document.querySelectorAll('.container');
-            sections.forEach(section => section.classList.add('hidden'));
+  <section id="register" class="container">
+    <h2>Registrar Cuenta</h2>
+    <form>
+      <label for="email-register">Correo Electrónico:</label>
+      <input type="email" id="email-register" placeholder="Ingresa tu correo">
+      <label for="password-register">Contraseña:</label>
+      <input type="password" id="password-register" placeholder="Crea una contraseña">
+      <button type="button" class="button">Registrar</button>
+    </form>
+  </section>
 
-            // Mostrar la sección seleccionada
-            const selectedSection = document.getElementById(sectionId);
-            selectedSection.classList.remove('hidden');
-        }
-    </script>
+  <section id="home" class="container">
+    <h2>Subir Facturas</h2>
+    <form>
+      <label for="factura-titulo">Título de la Factura:</label>
+      <input type="text" id="factura-titulo" placeholder="Nombre o título de la factura">
+      
+      <label for="factura-monto">Monto:</label>
+      <input type="number" id="factura-monto" placeholder="Monto total">
+
+      <label for="factura-imagen">Subir Imagen de la Factura:</label>
+      <input type="file" id="factura-imagen" accept="image/*" capture="camera">
+
+      <button type="button" class="button">Guardar Factura</button>
+    </form>
+  </section>
+
+  <script>
+    // Aquí puedes agregar funcionalidad con JavaScript para guardar y mostrar facturas
+    // o incluso enviar los datos a un servidor para más procesamiento.
+    console.log("Código cargado. Puedes personalizar más funciones desde aquí.");
+  </script>
 </body>
 </html>
