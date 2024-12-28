@@ -1,11 +1,73 @@
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Página</title>
+    <title>Gestión de Facturas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #ffa500;
+            padding: 10px;
+            text-align: center;
+            color: white;
+        }
+        .container {
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #add8e6;
+        }
+    </style>
 </head>
 <body>
-    <h1>¡Hola, mundo!</h1>
-    <p>Mi página está en GitHub Pages.</p>
+    <header>
+        <h1>Gestión de Facturas</h1>
+    </header>
+    <div class="container">
+        <p>Bienvenido a tu página para gestionar facturas.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Número de Factura</th>
+                    <th>Fecha</th>
+                    <th>Monto</th>
+                    <th>Descripción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>001</td>
+                    <td>2024-12-28</td>
+                    <td>$100</td>
+                    <td>Compra de suministros</td>
+                </tr>
+                <tr>
+                    <td>002</td>
+                    <td>2024-12-27</td>
+                    <td>$200</td>
+                    <td>Servicio técnico</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>
