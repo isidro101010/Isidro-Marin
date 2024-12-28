@@ -9,23 +9,24 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
       padding: 0;
-      background: linear-gradient(to right, #FFA500, #0000FF);
+      background: #f0f0f0;
       transition: background 0.5s ease;
     }
 
     header {
-      background-color: #FFA500;
+      background-color: #007aff;
       color: white;
       text-align: center;
       padding: 1rem 0;
-      transition: background-color 0.5s ease;
       font-size: 2em;
       font-weight: bold;
       position: relative;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     h1, h2 {
       text-align: center;
+      color: #333;
     }
 
     .container {
@@ -34,12 +35,12 @@
       background: white;
       padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       transition: box-shadow 0.5s ease;
     }
 
     .button {
-      background-color: #FFA500;
+      background-color: #007aff;
       color: white;
       padding: 10px 20px;
       border: none;
@@ -50,11 +51,7 @@
     }
 
     .button:hover {
-      background-color: #FF6347;
-    }
-
-    .button.loading {
-      background-color: blue;
+      background-color: #005bb5;
     }
 
     input {
@@ -67,8 +64,8 @@
     }
 
     input:focus {
-      border-color: #FFA500;
-      box-shadow: 0 0 5px rgba(255, 165, 0, 0.5);
+      border-color: #007aff;
+      box-shadow: 0 0 5px rgba(0, 122, 255, 0.5);
     }
 
     nav {
@@ -79,7 +76,7 @@
     nav a {
       text-decoration: none;
       color: white;
-      background-color: #FFA500;
+      background-color: #007aff;
       padding: 10px 20px;
       margin: 0 5px;
       border-radius: 5px;
@@ -87,7 +84,7 @@
     }
 
     nav a:hover {
-      background-color: #FF6347;
+      background-color: #005bb5;
     }
 
     .invoice-list {
@@ -112,49 +109,6 @@
       cursor: pointer;
       background: none;
       border: none;
-    }
-
-    .hamburger {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      display: flex;
-      flex-direction: column;
-      cursor: pointer;
-    }
-
-    .hamburger div {
-      width: 25px;
-      height: 3px;
-      background-color: white;
-      margin: 4px 0;
-      transition: 0.4s;
-    }
-
-    .menu {
-      display: none;
-      flex-direction: column;
-      background-color: #FFA500;
-      position: absolute;
-      top: 40px;
-      right: 10px;
-      border-radius: 5px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    .menu a {
-      padding: 10px 20px;
-      text-decoration: none;
-      color: white;
-      border-bottom: 1px solid #FF6347;
-    }
-
-    .menu a:hover {
-      background-color: #FF6347;
-    }
-
-    .menu a:last-child {
-      border-bottom: none;
     }
 
     .fade-in {
@@ -188,7 +142,7 @@
     .progress-bar {
       width: 0;
       height: 5px;
-      background-color: blue;
+      background-color: #007aff;
       transition: width 0.5s ease;
     }
   </style>
@@ -200,14 +154,6 @@
 
   <header>
     Renova Energía Facturas
-    <div class="hamburger" onclick="toggleMenu()">
-      <div></div>
-      <div></div>
-      <div></div>
-    </div>
-    <div class="menu" id="menu">
-      <a href="#login" onclick="logout()">Cerrar Sesión</a>
-    </div>
   </header>
 
   <nav>
@@ -425,40 +371,6 @@
       const loadingScreen = document.getElementById('loading-screen');
       loadingScreen.classList.add('hidden');
     });
-
-    const toggleMenu = () => {
-      const menu = document.getElementById('menu');
-      menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
-    };
-
-    const logout = () => {
-      localStorage.removeItem('currentUser');
-      window.location.href = '#login';
-      document.getElementById('home').style.display = 'none';
-      document.getElementById('login').style.display = 'block';
-      document.getElementById('register').style.display = 'block';
-    };
-
-    const searchInvoices = () => {
-      const query = document.getElementById('search-bar').value.toLowerCase();
-      const filteredInvoices = invoices.filter(invoice => 
-        invoice.pdfData.toLowerCase().includes(query)
-      );
-      const invoiceList = document.getElementById('invoice-list');
-      invoiceList.innerHTML = '<div id="select-all-container"><input type="checkbox" id="select-all" onclick="toggleSelectAll()"><button id="delete-selected" onclick="deleteSelectedInvoices()" style="display: none;">Borrar</button></div>';
-      filteredInvoices.forEach((invoice, index) => {
-        const invoiceItem = document.createElement('div');
-        invoiceItem.className = 'invoice-item';
-        invoiceItem.innerHTML = `
-          <span>Factura ${index + 1}</span>
-          <div class="actions">
-            <input type="checkbox" class="select-invoice" data-index="${index}">
-            <button class="delete" onclick="deleteInvoice(${index})">Eliminar</button>
-          </div>
-        `;
-        invoiceList.appendChild(invoiceItem);
-      });
-    };
   </script>
 </body>
 </html>
