@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Facturas</title>
+    <title>Mi Página</title>
 </head>
 <body>
-    <h1>Gestión de Facturas</h1>
-    <p>Bienvenido a tu página para gestionar facturas.</p>
+    <h1>¡Hola, mundo!</h1>
+    <p>Mi página está en GitHub Pages.</p>
 </body>
 </html>
