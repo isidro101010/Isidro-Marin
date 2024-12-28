@@ -7,119 +7,118 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f4f4f9;
-            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f8ff;
         }
-        h1 {
+        header {
+            background-color: #007BFF;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-size: 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .title {
+            text-align: center;
+            font-size: 2rem;
             color: #007BFF;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #007BFF;
+        .button {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            margin: 1rem 0;
+            font-size: 1rem;
             color: white;
-        }
-        input, button {
-            padding: 10px;
-            margin: 5px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        button {
-            background-color: #007BFF;
-            color: white;
+            background: #007BFF;
+            border: none;
+            border-radius: 4px;
             cursor: pointer;
+            transition: background 0.3s ease-in-out;
         }
-        button:hover {
-            background-color: #0056b3;
+        .button:hover {
+            background: #0056b3;
+        }
+        .form-control {
+            width: 100%;
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .link {
+            text-decoration: none;
+            color: #007BFF;
+            font-size: 0.9rem;
+        }
+        .link:hover {
+            text-decoration: underline;
+        }
+        .fade-in {
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Gestión de Facturas</h1>
-    <div>
-        <h2>Registrar Factura</h2>
-        <form id="facturaForm">
-            <input type="text" id="numero" placeholder="Número de Factura" required>
-            <input type="text" id="cliente" placeholder="Cliente" required>
-            <input type="number" id="monto" placeholder="Monto" required>
-            <input type="date" id="fecha" required>
-            <button type="submit">Agregar</button>
+    <header>Gestión de Facturas</header>
+    <div class="container fade-in" id="home">
+        <h1 class="title">Bienvenido</h1>
+        <p>Gestiona tus facturas de forma fácil y segura. Por favor, inicia sesión o crea una cuenta para comenzar.</p>
+        <button class="button" onclick="showLogin()">Iniciar Sesión</button>
+        <button class="button" onclick="showRegister()">Crear Cuenta</button>
+    </div>
+    <div class="container fade-in" id="login" style="display:none;">
+        <h1 class="title">Iniciar Sesión</h1>
+        <form>
+            <input type="text" class="form-control" placeholder="Usuario" required>
+            <input type="password" class="form-control" placeholder="Contraseña" required>
+            <button class="button" type="submit">Entrar</button>
         </form>
+        <a class="link" href="#" onclick="showHome()">Volver</a>
     </div>
-
-    <div>
-        <h2>Buscar Factura</h2>
-        <input type="text" id="buscar" placeholder="Buscar por cliente o número...">
+    <div class="container fade-in" id="register" style="display:none;">
+        <h1 class="title">Crear Cuenta</h1>
+        <form>
+            <input type="text" class="form-control" placeholder="Usuario" required>
+            <input type="email" class="form-control" placeholder="Correo Electrónico" required>
+            <input type="password" class="form-control" placeholder="Contraseña" required>
+            <button class="button" type="submit">Registrarse</button>
+        </form>
+        <a class="link" href="#" onclick="showHome()">Volver</a>
     </div>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Número</th>
-                <th>Cliente</th>
-                <th>Monto</th>
-                <th>Fecha</th>
-            </tr>
-        </thead>
-        <tbody id="facturaTabla">
-            <!-- Aquí se agregarán las facturas dinámicamente -->
-        </tbody>
-    </table>
-
     <script>
-        const form = document.getElementById('facturaForm');
-        const tabla = document.getElementById('facturaTabla');
-        const buscar = document.getElementById('buscar');
-
-        let facturas = [];
-
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const numero = document.getElementById('numero').value;
-            const cliente = document.getElementById('cliente').value;
-            const monto = document.getElementById('monto').value;
-            const fecha = document.getElementById('fecha').value;
-
-            facturas.push({ numero, cliente, monto, fecha });
-            actualizarTabla();
-            form.reset();
-        });
-
-        buscar.addEventListener('input', () => {
-            const filtro = buscar.value.toLowerCase();
-            actualizarTabla(filtro);
-        });
-
-        function actualizarTabla(filtro = '') {
-            tabla.innerHTML = '';
-            facturas
-                .filter(factura => 
-                    factura.numero.toLowerCase().includes(filtro) ||
-                    factura.cliente.toLowerCase().includes(filtro)
-                )
-                .forEach(factura => {
-                    const fila = `
-                        <tr>
-                            <td>${factura.numero}</td>
-                            <td>${factura.cliente}</td>
-                            <td>${factura.monto}</td>
-                            <td>${factura.fecha}</td>
-                        </tr>
-                    `;
-                    tabla.innerHTML += fila;
-                });
+        function showHome() {
+            document.getElementById("home").style.display = "block";
+            document.getElementById("login").style.display = "none";
+            document.getElementById("register").style.display = "none";
+        }
+        function showLogin() {
+            document.getElementById("home").style.display = "none";
+            document.getElementById("login").style.display = "block";
+            document.getElementById("register").style.display = "none";
+        }
+        function showRegister() {
+            document.getElementById("home").style.display = "none";
+            document.getElementById("login").style.display = "none";
+            document.getElementById("register").style.display = "block";
         }
     </script>
 </body>
