@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gestión de Facturas</title>
+  <title>Renova Energía Facturas</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
       padding: 0;
       background: linear-gradient(to right, #FFA500, #0000FF);
@@ -19,6 +19,8 @@
       text-align: center;
       padding: 1rem 0;
       transition: background-color 0.5s ease;
+      font-size: 2em;
+      font-weight: bold;
     }
 
     h1, h2 {
@@ -26,7 +28,7 @@
     }
 
     .container {
-      max-width: 600px;
+      max-width: 800px;
       margin: auto;
       background: white;
       padding: 20px;
@@ -95,7 +97,7 @@
 </head>
 <body>
   <header>
-    <h1>Gestión de Facturas</h1>
+    Renova Energía Facturas
   </header>
 
   <nav>
@@ -122,6 +124,10 @@
     <section id="register" class="container" aria-labelledby="register-heading">
       <h2 id="register-heading">Registrar Cuenta</h2>
       <form id="register-form">
+        <label for="name-register">Nombre:</label>
+        <input type="text" id="name-register" placeholder="Ingresa tu nombre" required aria-required="true">
+        <label for="number-register">Número:</label>
+        <input type="text" id="number-register" placeholder="Ingresa tu número" required aria-required="true">
         <label for="email-register">Correo Electrónico:</label>
         <input type="email" id="email-register" placeholder="Ingresa tu correo" required aria-required="true">
         <label for="password-register">Contraseña:</label>
@@ -160,11 +166,11 @@
 
   <script>
     let loggedIn = false;
-    let currentUser = null;
+    let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
 
     // Simulación de base de datos local para usuarios y facturas
-    const users = [];
-    const invoices = [];
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const invoices = JSON.parse(localStorage.getItem('invoices')) || [];
 
     // Función para iniciar sesión
     const loginUser = (email, password) => {
@@ -172,6 +178,7 @@
       if (user) {
         loggedIn = true;
         currentUser = user;
+        localStorage.setItem('currentUser', JSON.stringify(user));
         document.getElementById('home').style.display = 'block';
         document.getElementById('login').style.display = 'none';
         document.getElementById('register').style.display = 'none';
@@ -184,21 +191,26 @@
     };
 
     // Función para registrar un nuevo usuario
-    const registerUser = (email, password) => {
+    const registerUser = (name, number, email, password) => {
       const userExists = users.some(user => user.email === email);
       if (userExists) {
         document.getElementById('register-error').style.display = 'block';
       } else {
-        users.push({ email, password });
+        const user = { name, number, email, password };
+        users.push(user);
+        localStorage.setItem('users', JSON.stringify(users));
         document.getElementById('register-form').reset();
         alert('Usuario registrado exitosamente. Puedes iniciar sesión ahora.');
+        window.location.href = '#login';
       }
     };
 
     // Función para guardar factura
     const saveInvoice = (title, amount, date) => {
       if (loggedIn) {
-        invoices.push({ title, amount, date, user: currentUser.email });
+        const invoice = { title, amount, date, user: currentUser.email };
+        invoices.push(invoice);
+        localStorage.setItem('invoices', JSON.stringify(invoices));
         document.getElementById('invoice-success').style.display = 'block';
         document.getElementById('invoice-error').style.display = 'none';
         document.getElementById('invoice-form').reset();
@@ -238,6 +250,15 @@
       });
     };
 
+    // Check if user is already logged in
+    if (currentUser) {
+      loggedIn = true;
+      document.getElementById('home').style.display = 'block';
+      document.getElementById('login').style.display = 'none';
+      document.getElementById('register').style.display = 'none';
+      renderInvoices();
+    }
+
     // Manejo de inicio de sesión
     document.getElementById('login-form').addEventListener('submit', (event) => {
       event.preventDefault();
@@ -249,9 +270,11 @@
     // Manejo de registro
     document.getElementById('register-form').addEventListener('submit', (event) => {
       event.preventDefault();
+      const name = document.getElementById('name-register').value;
+      const number = document.getElementById('number-register').value;
       const email = document.getElementById('email-register').value;
       const password = document.getElementById('password-register').value;
-      registerUser(email, password);
+      registerUser(name, number, email, password);
     });
 
     // Manejo de subir factura
