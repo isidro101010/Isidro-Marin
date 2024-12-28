@@ -95,7 +95,6 @@
       border-bottom: 1px solid #ccc;
     }
 
-    /* Hamburger Menu */
     .hamburger {
       position: absolute;
       top: 10px;
@@ -139,7 +138,6 @@
       border-bottom: none;
     }
 
-    /* Animations */
     .fade-in {
       animation: fadeIn 1s ease-in-out;
     }
@@ -193,7 +191,6 @@
   </nav>
 
   <main>
-    <!-- INICIO DE SESIÓN -->
     <section id="login" class="container fade-in" aria-labelledby="login-heading">
       <h2 id="login-heading">Iniciar Sesión</h2>
       <form id="login-form">
@@ -207,7 +204,6 @@
       <p id="login-error" style="color: red; display: none;" aria-live="assertive">Correo o contraseña incorrectos. Intenta de nuevo.</p>
     </section>
 
-    <!-- REGISTRO -->
     <section id="register" class="container fade-in" aria-labelledby="register-heading">
       <h2 id="register-heading">Registrar Cuenta</h2>
       <form id="register-form">
@@ -224,7 +220,6 @@
       <p id="register-error" style="color: red; display: none;" aria-live="assertive">Este correo ya está registrado. Intenta con otro.</p>
     </section>
 
-    <!-- HOME - SUBIR FACTURAS -->
     <section id="home" class="container fade-in" style="display: none;" aria-labelledby="home-heading">
       <h2 id="home-heading">Subir Facturas</h2>
       <form id="invoice-form">
@@ -258,7 +253,6 @@
     </section>
   </main>
 
-  <!-- Search bar -->
   <div class="search-container">
     <input type="text" id="search-bar" placeholder="Buscar facturas...">
     <button onclick="searchInvoices()">Buscar</button>
@@ -269,11 +263,9 @@
     let loggedIn = false;
     let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
 
-    // Simulación de base de datos local para usuarios y facturas
     const users = JSON.parse(localStorage.getItem('users')) || [];
     const invoices = JSON.parse(localStorage.getItem('invoices')) || [];
 
-    // Función para iniciar sesión
     const loginUser = (email, password) => {
       const user = users.find(user => user.email === email && user.password === password);
       if (user) {
@@ -291,7 +283,6 @@
       }
     };
 
-    // Función para registrar un nuevo usuario
     const registerUser = (name, number, email, password) => {
       const userExists = users.some(user => user.email === email);
       if (userExists) {
@@ -306,7 +297,6 @@
       }
     };
 
-    // Función para guardar factura
     const saveInvoice = (title, number, amount, date) => {
       if (loggedIn) {
         const currency = document.getElementById('currency-selector').value;
@@ -322,19 +312,17 @@
       }
     };
 
-    // Función para renderizar facturas
     const renderInvoices = () => {
       const invoiceList = document.getElementById('invoice-list');
       invoiceList.innerHTML = '';
       invoices.filter(invoice => invoice.user === currentUser.email).forEach(invoice => {
         const invoiceItem = document.createElement('div');
         invoiceItem.className = 'invoice-item';
-        invoiceItem.innerHTML = `<strong>Título:</strong> ${invoice.title} | <strong>Número:</strong> ${invoice.number} | <strong>Monto:</strong> ${invoice.amount} ${invoice.currency} | <strong>Fecha:</strong> ${invoice.date}`;
+        invoiceItem.innerHTML = `<strong>Título:</strong> ${invoice.title} | <strong>Número:</strong> ${invoice.number} | <strong>Monto:</strong> ${invoice.amount} ${invoice.currency} | <strong>Fech[...]
         invoiceList.appendChild(invoiceItem);
       });
     };
 
-    // Check if user is already logged in
     if (currentUser) {
       loggedIn = true;
       document.getElementById('home').style.display = 'block';
@@ -343,7 +331,6 @@
       renderInvoices();
     }
 
-    // Manejo de inicio de sesión
     document.getElementById('login-form').addEventListener('submit', (event) => {
       event.preventDefault();
       const email = document.getElementById('email-login').value;
@@ -351,7 +338,6 @@
       loginUser(email, password);
     });
 
-    // Manejo de registro
     document.getElementById('register-form').addEventListener('submit', (event) => {
       event.preventDefault();
       const name = document.getElementById('name-register').value;
@@ -361,7 +347,6 @@
       registerUser(name, number, email, password);
     });
 
-    // Manejo de subir factura
     document.getElementById('invoice-form').addEventListener('submit', (event) => {
       event.preventDefault();
       const title = document.getElementById('factura-titulo').value;
@@ -371,19 +356,16 @@
       saveInvoice(title, number, amount, date);
     });
 
-    // Hide loading screen after page loads
     window.addEventListener('load', () => {
       const loadingScreen = document.getElementById('loading-screen');
       loadingScreen.classList.add('hidden');
     });
 
-    // Función para mostrar/ocultar el menú
     const toggleMenu = () => {
       const menu = document.getElementById('menu');
       menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
     };
 
-    // Función para cerrar sesión
     const logout = () => {
       localStorage.removeItem('currentUser');
       window.location.href = '#login';
@@ -392,7 +374,6 @@
       document.getElementById('register').style.display = 'block';
     };
 
-    // Función para buscar facturas
     const searchInvoices = () => {
       const query = document.getElementById('search-bar').value.toLowerCase();
       const filteredInvoices = invoices.filter(invoice => 
@@ -405,12 +386,11 @@
       filteredInvoices.forEach(invoice => {
         const invoiceItem = document.createElement('div');
         invoiceItem.className = 'invoice-item';
-        invoiceItem.innerHTML = `<strong>Título:</strong> ${invoice.title} | <strong>Número:</strong> ${invoice.number} | <strong>Monto:</strong> ${invoice.amount} ${invoice.currency} | <strong>Fecha:</strong> ${invoice.date}`;
+        invoiceItem.innerHTML = `<strong>Título:</strong> ${invoice.title} | <strong>Número:</strong> ${invoice.number} | <strong>Monto:</strong> ${invoice.amount} ${invoice.currency} | <strong>Fech[...]
         invoiceList.appendChild(invoiceItem);
       });
     };
 
-    // Función para leer el contenido de un PDF
     document.getElementById('pdf-upload').addEventListener('change', async (event) => {
       const file = event.target.files[0];
       if (file) {
@@ -431,11 +411,7 @@
       }
     });
 
-    // Función para extraer datos del PDF y rellenar el formulario
     const extractInvoiceData = (text) => {
-      // Implementar la lógica para extraer título, número, monto, y fecha del texto del PDF
-      // Esto puede requerir expresiones regulares u otra lógica basada en el formato del PDF
-      // Ejemplo simple de extracción:
       const titleMatch = text.match(/Título:\s*(.*)/);
       const numberMatch = text.match(/Número:\s*(.*)/);
       const amountMatch = text.match(/Monto:\s*(.*)/);
