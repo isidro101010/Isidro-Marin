@@ -21,6 +21,7 @@
       transition: background-color 0.5s ease;
       font-size: 2em;
       font-weight: bold;
+      position: relative;
     }
 
     h1, h2 {
@@ -94,6 +95,50 @@
       border-bottom: 1px solid #ccc;
     }
 
+    /* Hamburger Menu */
+    .hamburger {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+    }
+
+    .hamburger div {
+      width: 25px;
+      height: 3px;
+      background-color: white;
+      margin: 4px 0;
+      transition: 0.4s;
+    }
+
+    .menu {
+      display: none;
+      flex-direction: column;
+      background-color: #FFA500;
+      position: absolute;
+      top: 40px;
+      right: 10px;
+      border-radius: 5px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .menu a {
+      padding: 10px 20px;
+      text-decoration: none;
+      color: white;
+      border-bottom: 1px solid #FF6347;
+    }
+
+    .menu a:hover {
+      background-color: #FF6347;
+    }
+
+    .menu a:last-child {
+      border-bottom: none;
+    }
+
     /* Animations */
     .fade-in {
       animation: fadeIn 1s ease-in-out;
@@ -131,6 +176,14 @@
 
   <header>
     Renova Energía Facturas
+    <div class="hamburger" onclick="toggleMenu()">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+    <div class="menu" id="menu">
+      <a href="#login" onclick="logout()">Cerrar Sesión</a>
+    </div>
   </header>
 
   <nav>
@@ -313,6 +366,21 @@
       const loadingScreen = document.getElementById('loading-screen');
       loadingScreen.classList.add('hidden');
     });
+
+    // Función para mostrar/ocultar el menú
+    const toggleMenu = () => {
+      const menu = document.getElementById('menu');
+      menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+    };
+
+    // Función para cerrar sesión
+    const logout = () => {
+      localStorage.removeItem('currentUser');
+      window.location.href = '#login';
+      document.getElementById('home').style.display = 'none';
+      document.getElementById('login').style.display = 'block';
+      document.getElementById('register').style.display = 'block';
+    };
   </script>
 </body>
 </html>
