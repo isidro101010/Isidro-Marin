@@ -318,7 +318,7 @@
       invoices.filter(invoice => invoice.user === currentUser.email).forEach(invoice => {
         const invoiceItem = document.createElement('div');
         invoiceItem.className = 'invoice-item';
-        invoiceItem.innerHTML = `<strong>Título:</strong> ${invoice.title} | <strong>Número:</strong> ${invoice.number} | <strong>Monto:</strong> ${invoice.amount} ${invoice.currency} | <strong>Fech[...]
+        invoiceItem.innerHTML = `<strong>Título:</strong> ${invoice.title} | <strong>Número:</strong> ${invoice.number} | <strong>Monto:</strong> ${invoice.amount} ${invoice.currency} | <strong>Fecha:</strong> ${invoice.date}`;
         invoiceList.appendChild(invoiceItem);
       });
     };
@@ -386,7 +386,7 @@
       filteredInvoices.forEach(invoice => {
         const invoiceItem = document.createElement('div');
         invoiceItem.className = 'invoice-item';
-        invoiceItem.innerHTML = `<strong>Título:</strong> ${invoice.title} | <strong>Número:</strong> ${invoice.number} | <strong>Monto:</strong> ${invoice.amount} ${invoice.currency} | <strong>Fech[...]
+        invoiceItem.innerHTML = `<strong>Título:</strong> ${invoice.title} | <strong>Número:</strong> ${invoice.number} | <strong>Monto:</strong> ${invoice.amount} ${invoice.currency} | <strong>Fecha:</strong> ${invoice.date}`;
         invoiceList.appendChild(invoiceItem);
       });
     };
