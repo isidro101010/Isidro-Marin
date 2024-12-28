@@ -93,9 +93,42 @@
       padding: 10px;
       border-bottom: 1px solid #ccc;
     }
+
+    /* Animations */
+    .fade-in {
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s ease;
+    }
+
+    .loading-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
+  <div class="loading-screen" id="loading-screen">
+    <h1>Cargando...</h1>
+  </div>
+
   <header>
     Renova Energía Facturas
   </header>
@@ -108,7 +141,7 @@
 
   <main>
     <!-- INICIO DE SESIÓN -->
-    <section id="login" class="container" aria-labelledby="login-heading">
+    <section id="login" class="container fade-in" aria-labelledby="login-heading">
       <h2 id="login-heading">Iniciar Sesión</h2>
       <form id="login-form">
         <label for="email-login">Correo Electrónico:</label>
@@ -117,11 +150,12 @@
         <input type="password" id="password-login" placeholder="Ingresa tu contraseña" required aria-required="true">
         <button type="submit" class="button">Iniciar Sesión</button>
       </form>
+      <a href="#forgot-password">Olvidé mi contraseña</a>
       <p id="login-error" style="color: red; display: none;" aria-live="assertive">Correo o contraseña incorrectos. Intenta de nuevo.</p>
     </section>
 
     <!-- REGISTRO -->
-    <section id="register" class="container" aria-labelledby="register-heading">
+    <section id="register" class="container fade-in" aria-labelledby="register-heading">
       <h2 id="register-heading">Registrar Cuenta</h2>
       <form id="register-form">
         <label for="name-register">Nombre:</label>
@@ -138,14 +172,20 @@
     </section>
 
     <!-- HOME - SUBIR FACTURAS -->
-    <section id="home" class="container" style="display: none;" aria-labelledby="home-heading">
+    <section id="home" class="container fade-in" style="display: none;" aria-labelledby="home-heading">
       <h2 id="home-heading">Subir Facturas</h2>
       <form id="invoice-form">
         <label for="factura-titulo">Título de la Factura:</label>
         <input type="text" id="factura-titulo" placeholder="Nombre o título de la factura" required aria-required="true">
         
         <label for="factura-monto">Monto:</label>
-        <input type="number" id="factura-monto" placeholder="Monto total" required aria-required="true">
+        <div>
+          <input type="number" id="factura-monto" placeholder="Monto total" required aria-required="true">
+          <select id="currency-selector" required aria-required="true">
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+          </select>
+        </div>
 
         <label for="factura-fecha">Fecha:</label>
         <input type="date" id="factura-fecha" required aria-required="true">
@@ -156,11 +196,6 @@
       <p id="invoice-error" style="color: red; display: none;" aria-live="assertive">Hubo un problema al guardar la factura. Intenta de nuevo.</p>
 
       <div class="invoice-list" id="invoice-list"></div>
-    </section>
-
-    <section class="container">
-      <h2>Buscar Facturas</h2>
-      <input type="text" id="search-invoice" placeholder="Buscar por título, monto o fecha">
     </section>
   </main>
 
@@ -208,7 +243,8 @@
     // Función para guardar factura
     const saveInvoice = (title, amount, date) => {
       if (loggedIn) {
-        const invoice = { title, amount, date, user: currentUser.email };
+        const currency = document.getElementById('currency-selector').value;
+        const invoice = { title, amount, currency, date, user: currentUser.email };
         invoices.push(invoice);
         localStorage.setItem('invoices', JSON.stringify(invoices));
         document.getElementById('invoice-success').style.display = 'block';
@@ -227,25 +263,7 @@
       invoices.filter(invoice => invoice.user === currentUser.email).forEach(invoice => {
         const invoiceItem = document.createElement('div');
         invoiceItem.className = 'invoice-item';
-        invoiceItem.innerHTML = `<strong>Título:</strong> ${invoice.title} | <strong>Monto:</strong> ${invoice.amount} | <strong>Fecha:</strong> ${invoice.date}`;
-        invoiceList.appendChild(invoiceItem);
-      });
-    };
-
-    // Función para buscar facturas
-    const searchInvoices = (query) => {
-      const filteredInvoices = invoices.filter(invoice =>
-        invoice.user === currentUser.email &&
-        (invoice.title.toLowerCase().includes(query.toLowerCase()) ||
-         invoice.amount.toString().includes(query) ||
-         invoice.date.includes(query))
-      );
-      const invoiceList = document.getElementById('invoice-list');
-      invoiceList.innerHTML = '';
-      filteredInvoices.forEach(invoice => {
-        const invoiceItem = document.createElement('div');
-        invoiceItem.className = 'invoice-item';
-        invoiceItem.innerHTML = `<strong>Título:</strong> ${invoice.title} | <strong>Monto:</strong> ${invoice.amount} | <strong>Fecha:</strong> ${invoice.date}`;
+        invoiceItem.innerHTML = `<strong>Título:</strong> ${invoice.title} | <strong>Monto:</strong> ${invoice.amount} ${invoice.currency} | <strong>Fecha:</strong> ${invoice.date}`;
         invoiceList.appendChild(invoiceItem);
       });
     };
@@ -286,9 +304,10 @@
       saveInvoice(title, amount, date);
     });
 
-    // Manejo de búsqueda
-    document.getElementById('search-invoice').addEventListener('input', (event) => {
-      searchInvoices(event.target.value);
+    // Hide loading screen after page loads
+    window.addEventListener('load', () => {
+      const loadingScreen = document.getElementById('loading-screen');
+      loadingScreen.classList.add('hidden');
     });
   </script>
 </body>
