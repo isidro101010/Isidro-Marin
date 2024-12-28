@@ -84,48 +84,117 @@
     <a href="#home">Home</a>
   </nav>
 
+  <!-- INICIO DE SESIÓN -->
   <section id="login" class="container">
     <h2>Iniciar Sesión</h2>
-    <form>
+    <form id="login-form">
       <label for="email-login">Correo Electrónico:</label>
-      <input type="email" id="email-login" placeholder="Ingresa tu correo">
+      <input type="email" id="email-login" placeholder="Ingresa tu correo" required>
       <label for="password-login">Contraseña:</label>
-      <input type="password" id="password-login" placeholder="Ingresa tu contraseña">
-      <button type="button" class="button">Iniciar Sesión</button>
+      <input type="password" id="password-login" placeholder="Ingresa tu contraseña" required>
+      <button type="submit" class="button">Iniciar Sesión</button>
     </form>
+    <p id="login-error" style="color: red; display: none;">Correo o contraseña incorrectos. Intenta de nuevo.</p>
   </section>
 
+  <!-- REGISTRO -->
   <section id="register" class="container">
     <h2>Registrar Cuenta</h2>
-    <form>
+    <form id="register-form">
       <label for="email-register">Correo Electrónico:</label>
-      <input type="email" id="email-register" placeholder="Ingresa tu correo">
+      <input type="email" id="email-register" placeholder="Ingresa tu correo" required>
       <label for="password-register">Contraseña:</label>
-      <input type="password" id="password-register" placeholder="Crea una contraseña">
-      <button type="button" class="button">Registrar</button>
+      <input type="password" id="password-register" placeholder="Crea una contraseña" required>
+      <button type="submit" class="button">Registrar</button>
     </form>
+    <p id="register-error" style="color: red; display: none;">Este correo ya está registrado. Intenta con otro.</p>
   </section>
 
-  <section id="home" class="container">
+  <!-- HOME - SUBIR FACTURAS -->
+  <section id="home" class="container" style="display: none;">
     <h2>Subir Facturas</h2>
-    <form>
+    <form id="invoice-form">
       <label for="factura-titulo">Título de la Factura:</label>
-      <input type="text" id="factura-titulo" placeholder="Nombre o título de la factura">
+      <input type="text" id="factura-titulo" placeholder="Nombre o título de la factura" required>
       
       <label for="factura-monto">Monto:</label>
-      <input type="number" id="factura-monto" placeholder="Monto total">
+      <input type="number" id="factura-monto" placeholder="Monto total" required>
 
-      <label for="factura-imagen">Subir Imagen de la Factura:</label>
-      <input type="file" id="factura-imagen" accept="image/*" capture="camera">
-
-      <button type="button" class="button">Guardar Factura</button>
+      <button type="submit" class="button">Guardar Factura</button>
     </form>
+    <p id="invoice-success" style="color: green; display: none;">Factura guardada exitosamente.</p>
+    <p id="invoice-error" style="color: red; display: none;">Hubo un problema al guardar la factura. Intenta de nuevo.</p>
   </section>
 
   <script>
-    // Aquí puedes agregar funcionalidad con JavaScript para guardar y mostrar facturas
-    // o incluso enviar los datos a un servidor para más procesamiento.
-    console.log("Código cargado. Puedes personalizar más funciones desde aquí.");
+    let loggedIn = false;
+    let currentUser = null;
+
+    // Simulación de base de datos local para usuarios y facturas
+    const users = [];
+    const invoices = [];
+
+    // Función para iniciar sesión
+    const loginUser = (email, password) => {
+      const user = users.find(user => user.email === email && user.password === password);
+      if (user) {
+        loggedIn = true;
+        currentUser = user;
+        document.getElementById('home').style.display = 'block';
+        document.getElementById('login-error').style.display = 'none';
+        document.getElementById('login-form').reset();
+      } else {
+        document.getElementById('login-error').style.display = 'block';
+      }
+    };
+
+    // Función para registrar un nuevo usuario
+    const registerUser = (email, password) => {
+      const userExists = users.some(user => user.email === email);
+      if (userExists) {
+        document.getElementById('register-error').style.display = 'block';
+      } else {
+        users.push({ email, password });
+        document.getElementById('register-form').reset();
+        alert('Usuario registrado exitosamente. Puedes iniciar sesión ahora.');
+      }
+    };
+
+    // Función para guardar factura
+    const saveInvoice = (title, amount) => {
+      if (loggedIn) {
+        invoices.push({ title, amount, user: currentUser.email });
+        document.getElementById('invoice-success').style.display = 'block';
+        document.getElementById('invoice-error').style.display = 'none';
+        document.getElementById('invoice-form').reset();
+      } else {
+        document.getElementById('invoice-error').style.display = 'block';
+      }
+    };
+
+    // Manejo de inicio de sesión
+    document.getElementById('login-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const email = document.getElementById('email-login').value;
+      const password = document.getElementById('password-login').value;
+      loginUser(email, password);
+    });
+
+    // Manejo de registro
+    document.getElementById('register-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const email = document.getElementById('email-register').value;
+      const password = document.getElementById('password-register').value;
+      registerUser(email, password);
+    });
+
+    // Manejo de subir factura
+    document.getElementById('invoice-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const title = document.getElementById('factura-titulo').value;
+      const amount = document.getElementById('factura-monto').value;
+      saveInvoice(title, amount);
+    });
   </script>
 </body>
 </html>
