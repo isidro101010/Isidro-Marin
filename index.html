@@ -4,74 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gestión de Facturas</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: linear-gradient(to right, #87CEFA, #FFA07A);
-    }
-
-    header {
-      background-color: #008CBA;
-      color: white;
-      text-align: center;
-      padding: 1rem 0;
-    }
-
-    h1, h2 {
-      text-align: center;
-    }
-
-    .container {
-      max-width: 600px;
-      margin: auto;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    .button {
-      background-color: #FFA07A;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 1rem;
-    }
-
-    .button:hover {
-      background-color: #FF6347;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-
-    nav {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    nav a {
-      text-decoration: none;
-      color: white;
-      background-color: #008CBA;
-      padding: 10px 20px;
-      margin: 0 5px;
-      border-radius: 5px;
-    }
-
-    nav a:hover {
-      background-color: #005F73;
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header>
@@ -84,117 +17,50 @@
     <a href="#home">Home</a>
   </nav>
 
-  <!-- INICIO DE SESIÓN -->
-  <section id="login" class="container">
-    <h2>Iniciar Sesión</h2>
-    <form id="login-form">
-      <label for="email-login">Correo Electrónico:</label>
-      <input type="email" id="email-login" placeholder="Ingresa tu correo" required>
-      <label for="password-login">Contraseña:</label>
-      <input type="password" id="password-login" placeholder="Ingresa tu contraseña" required>
-      <button type="submit" class="button">Iniciar Sesión</button>
-    </form>
-    <p id="login-error" style="color: red; display: none;">Correo o contraseña incorrectos. Intenta de nuevo.</p>
-  </section>
+  <main>
+    <!-- INICIO DE SESIÓN -->
+    <section id="login" class="container" aria-labelledby="login-heading">
+      <h2 id="login-heading">Iniciar Sesión</h2>
+      <form id="login-form">
+        <label for="email-login">Correo Electrónico:</label>
+        <input type="email" id="email-login" placeholder="Ingresa tu correo" required aria-required="true">
+        <label for="password-login">Contraseña:</label>
+        <input type="password" id="password-login" placeholder="Ingresa tu contraseña" required aria-required="true">
+        <button type="submit" class="button">Iniciar Sesión</button>
+      </form>
+      <p id="login-error" style="color: red; display: none;" aria-live="assertive">Correo o contraseña incorrectos. Intenta de nuevo.</p>
+    </section>
 
-  <!-- REGISTRO -->
-  <section id="register" class="container">
-    <h2>Registrar Cuenta</h2>
-    <form id="register-form">
-      <label for="email-register">Correo Electrónico:</label>
-      <input type="email" id="email-register" placeholder="Ingresa tu correo" required>
-      <label for="password-register">Contraseña:</label>
-      <input type="password" id="password-register" placeholder="Crea una contraseña" required>
-      <button type="submit" class="button">Registrar</button>
-    </form>
-    <p id="register-error" style="color: red; display: none;">Este correo ya está registrado. Intenta con otro.</p>
-  </section>
+    <!-- REGISTRO -->
+    <section id="register" class="container" aria-labelledby="register-heading">
+      <h2 id="register-heading">Registrar Cuenta</h2>
+      <form id="register-form">
+        <label for="email-register">Correo Electrónico:</label>
+        <input type="email" id="email-register" placeholder="Ingresa tu correo" required aria-required="true">
+        <label for="password-register">Contraseña:</label>
+        <input type="password" id="password-register" placeholder="Crea una contraseña" required aria-required="true">
+        <button type="submit" class="button">Registrar</button>
+      </form>
+      <p id="register-error" style="color: red; display: none;" aria-live="assertive">Este correo ya está registrado. Intenta con otro.</p>
+    </section>
 
-  <!-- HOME - SUBIR FACTURAS -->
-  <section id="home" class="container" style="display: none;">
-    <h2>Subir Facturas</h2>
-    <form id="invoice-form">
-      <label for="factura-titulo">Título de la Factura:</label>
-      <input type="text" id="factura-titulo" placeholder="Nombre o título de la factura" required>
-      
-      <label for="factura-monto">Monto:</label>
-      <input type="number" id="factura-monto" placeholder="Monto total" required>
+    <!-- HOME - SUBIR FACTURAS -->
+    <section id="home" class="container" style="display: none;" aria-labelledby="home-heading">
+      <h2 id="home-heading">Subir Facturas</h2>
+      <form id="invoice-form">
+        <label for="factura-titulo">Título de la Factura:</label>
+        <input type="text" id="factura-titulo" placeholder="Nombre o título de la factura" required aria-required="true">
+        
+        <label for="factura-monto">Monto:</label>
+        <input type="number" id="factura-monto" placeholder="Monto total" required aria-required="true">
 
-      <button type="submit" class="button">Guardar Factura</button>
-    </form>
-    <p id="invoice-success" style="color: green; display: none;">Factura guardada exitosamente.</p>
-    <p id="invoice-error" style="color: red; display: none;">Hubo un problema al guardar la factura. Intenta de nuevo.</p>
-  </section>
+        <button type="submit" class="button">Guardar Factura</button>
+      </form>
+      <p id="invoice-success" style="color: green; display: none;" aria-live="polite">Factura guardada exitosamente.</p>
+      <p id="invoice-error" style="color: red; display: none;" aria-live="assertive">Hubo un problema al guardar la factura. Intenta de nuevo.</p>
+    </section>
+  </main>
 
-  <script>
-    let loggedIn = false;
-    let currentUser = null;
-
-    // Simulación de base de datos local para usuarios y facturas
-    const users = [];
-    const invoices = [];
-
-    // Función para iniciar sesión
-    const loginUser = (email, password) => {
-      const user = users.find(user => user.email === email && user.password === password);
-      if (user) {
-        loggedIn = true;
-        currentUser = user;
-        document.getElementById('home').style.display = 'block';
-        document.getElementById('login-error').style.display = 'none';
-        document.getElementById('login-form').reset();
-      } else {
-        document.getElementById('login-error').style.display = 'block';
-      }
-    };
-
-    // Función para registrar un nuevo usuario
-    const registerUser = (email, password) => {
-      const userExists = users.some(user => user.email === email);
-      if (userExists) {
-        document.getElementById('register-error').style.display = 'block';
-      } else {
-        users.push({ email, password });
-        document.getElementById('register-form').reset();
-        alert('Usuario registrado exitosamente. Puedes iniciar sesión ahora.');
-      }
-    };
-
-    // Función para guardar factura
-    const saveInvoice = (title, amount) => {
-      if (loggedIn) {
-        invoices.push({ title, amount, user: currentUser.email });
-        document.getElementById('invoice-success').style.display = 'block';
-        document.getElementById('invoice-error').style.display = 'none';
-        document.getElementById('invoice-form').reset();
-      } else {
-        document.getElementById('invoice-error').style.display = 'block';
-      }
-    };
-
-    // Manejo de inicio de sesión
-    document.getElementById('login-form').addEventListener('submit', (event) => {
-      event.preventDefault();
-      const email = document.getElementById('email-login').value;
-      const password = document.getElementById('password-login').value;
-      loginUser(email, password);
-    });
-
-    // Manejo de registro
-    document.getElementById('register-form').addEventListener('submit', (event) => {
-      event.preventDefault();
-      const email = document.getElementById('email-register').value;
-      const password = document.getElementById('password-register').value;
-      registerUser(email, password);
-    });
-
-    // Manejo de subir factura
-    document.getElementById('invoice-form').addEventListener('submit', (event) => {
-      event.preventDefault();
-      const title = document.getElementById('factura-titulo').value;
-      const amount = document.getElementById('factura-monto').value;
-      saveInvoice(title, amount);
-    });
-  </script>
+  <script src="scripts.js"></script>
 </body>
 </html>
