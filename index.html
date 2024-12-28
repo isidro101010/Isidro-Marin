@@ -53,6 +53,10 @@
       background-color: #FF6347;
     }
 
+    .button.loading {
+      background-color: blue;
+    }
+
     input {
       width: 100%;
       padding: 10px;
@@ -180,6 +184,13 @@
       opacity: 0;
       pointer-events: none;
     }
+
+    .progress-bar {
+      width: 0;
+      height: 5px;
+      background-color: blue;
+      transition: width 0.5s ease;
+    }
   </style>
 </head>
 <body>
@@ -240,6 +251,7 @@
       <form id="invoice-form">
         <input type="file" id="pdf-upload" accept="application/pdf">
         <button type="submit" class="button">Guardar Factura</button>
+        <div class="progress-bar" id="progress-bar"></div>
       </form>
       <p id="invoice-success" style="color: green; display: none;" aria-live="polite">Factura guardada exitosamente.</p>
       <p id="invoice-error" style="color: red; display: none;" aria-live="assertive">Hubo un problema al guardar la factura. Intenta de nuevo.</p>
@@ -255,7 +267,7 @@
 
   <div class="search-container">
     <input type="text" id="search-bar" placeholder="Buscar facturas...">
-    <button onclick="searchInvoices()">Buscar</button>
+    <button class="button" onclick="searchInvoices()">Buscar</button>
   </div>
 
   <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
@@ -352,6 +364,12 @@
       document.getElementById('delete-selected').style.display = selectAll ? 'inline' : 'none';
     };
 
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Delete') {
+        deleteSelectedInvoices();
+      }
+    });
+
     if (currentUser) {
       loggedIn = true;
       document.getElementById('home').style.display = 'block';
@@ -381,7 +399,21 @@
       const file = document.getElementById('pdf-upload').files[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = function() {
+        const progressBar = document.getElementById('progress-bar');
+        const button = document.querySelector('.button');
+        reader.onloadstart = () => {
+          button.classList.add('loading');
+          progressBar.style.width = '0';
+        };
+        reader.onprogress = (event) => {
+          if (event.lengthComputable) {
+            const percentLoaded = (event.loaded / event.total) * 100;
+            progressBar.style.width = percentLoaded + '%';
+          }
+        };
+        reader.onloadend = () => {
+          button.classList.remove('loading');
+          progressBar.style.width = '100%';
           const pdfData = reader.result;
           saveInvoice(pdfData);
         };
