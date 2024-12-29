@@ -148,29 +148,14 @@
       transition: width 0.5s ease;
     }
 
-    /* Decoraciones adicionales */
-    .solar-panel {
-      width: 100px;
-      height: 100px;
-      background: url('url-to-solar-panel-image.png') no-repeat center center;
-      background-size: cover;
-      margin: 10px auto;
-    }
-
-    .sun {
-      width: 50px;
-      height: 50px;
-      background: url('url-to-sun-image.png') no-repeat center center;
-      background-size: cover;
-      margin: 10px auto;
-    }
-
-    .house {
-      width: 100px;
-      height: 100px;
-      background: url('url-to-house-image.png') no-repeat center center;
-      background-size: cover;
-      margin: 10px auto;
+    .invoice-display {
+      margin-top: 20px;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 1.5s ease-in-out;
+      color: #007aff;
     }
   </style>
 </head>
@@ -190,10 +175,6 @@
   </nav>
 
   <main>
-    <div class="solar-panel"></div>
-    <div class="sun"></div>
-    <div class="house"></div>
-
     <section id="login" class="container fade-in" aria-labelledby="login-heading">
       <h2 id="login-heading">Iniciar Sesión</h2>
       <form id="login-form">
@@ -241,6 +222,8 @@
       </div>
     </section>
   </main>
+
+  <div class="invoice-display" id="invoice-display"></div>
 
   <div class="search-container">
     <input type="text" id="search-bar" placeholder="Buscar facturas...">
@@ -350,8 +333,8 @@
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
         const sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-        console.log(sheetData);
-        processInvoices(sheetData);
+        const invoiceData = processInvoiceData(sheetData);
+        displayInvoiceData(invoiceData);
       };
       reader.readAsArrayBuffer(file);
     };
@@ -370,21 +353,28 @@
             textContent += item.str + ' ';
           });
         }
-        console.log(textContent);
-        processInvoices(textContent);
+        const invoiceData = processInvoiceData(textContent);
+        displayInvoiceData(invoiceData);
       };
       reader.readAsArrayBuffer(file);
     };
 
-    const processInvoices = (data) => {
-      // Aquí se procesaría la información para detectar el número de facturas y formatearla adecuadamente
-      // Por demostración, asumimos que hemos procesado los datos en el formato deseado
-      const formattedData = `
-        NOMBRE: Isidro
-        FECHA: 2024-12-28
-        TOTAL: $1000
+    const processInvoiceData = (data) => {
+      const invoiceData = {
+        numeroFactura: data[0][1],
+        fecha: data[1][1],
+        cliente: data[2][1],
+      };
+      return invoiceData;
+    };
+
+    const displayInvoiceData = (invoiceData) => {
+      const invoiceDisplay = document.getElementById('invoice-display');
+      invoiceDisplay.innerHTML = `
+        <p>Número de Factura: ${invoiceData.numeroFactura}</p>
+        <p>Fecha: ${invoiceData.fecha}</p>
+        <p>Cliente: ${invoiceData.cliente}</p>
       `;
-      console.log(formattedData);
     };
 
     const analyzeFile = (file) => {
@@ -408,10 +398,10 @@
       document.getElementById('home').style.display = 'block';
       document.getElementById('login').style.display = 'none';
       document.getElementById('register').style.display = 'none';
-      document.getElementById('loading-screen').classList.add('hidden'); // Ocultar la pantalla de carga
+      document.getElementById('loading-screen').classList.add('hidden');
       renderInvoices();
     } else {
-      document.getElementById('loading-screen').classList.add('hidden'); // Ocultar la pantalla de carga si no está logueado
+      document.getElementById('loading-screen').classList.add('hidden');
     }
 
     document.getElementById('login-form').addEventListener('submit', (event) => {
@@ -464,4 +454,4 @@
     });
   </script>
 </body>
-</html> 
+</html>
