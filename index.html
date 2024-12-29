@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Renova Energía Facturas</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -149,16 +148,29 @@
       transition: width 0.5s ease;
     }
 
-    .decorations {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin-top: 20px;
-    }
-
-    .decorations img {
+    /* Decoraciones adicionales */
+    .solar-panel {
       width: 100px;
       height: 100px;
+      background: url('url-to-solar-panel-image.png') no-repeat center center;
+      background-size: cover;
+      margin: 10px auto;
+    }
+
+    .sun {
+      width: 50px;
+      height: 50px;
+      background: url('url-to-sun-image.png') no-repeat center center;
+      background-size: cover;
+      margin: 10px auto;
+    }
+
+    .house {
+      width: 100px;
+      height: 100px;
+      background: url('url-to-house-image.png') no-repeat center center;
+      background-size: cover;
+      margin: 10px auto;
     }
   </style>
 </head>
@@ -171,12 +183,6 @@
     Renova Energía Facturas
   </header>
 
-  <div class="decorations">
-    <img src="https://example.com/solar-panel.png" alt="Solar Panel">
-    <img src="https://example.com/sun.png" alt="Sun">
-    <img src="https://example.com/house.png" alt="House">
-  </div>
-
   <nav>
     <a href="#login">Iniciar Sesión</a>
     <a href="#register">Registrar</a>
@@ -184,6 +190,10 @@
   </nav>
 
   <main>
+    <div class="solar-panel"></div>
+    <div class="sun"></div>
+    <div class="house"></div>
+
     <section id="login" class="container fade-in" aria-labelledby="login-heading">
       <h2 id="login-heading">Iniciar Sesión</h2>
       <form id="login-form">
@@ -293,12 +303,7 @@
 
     const renderInvoices = () => {
       const invoiceList = document.getElementById('invoice-list');
-      invoiceList.innerHTML = `
-        <div id="select-all-container">
-          <input type="checkbox" id="select-all" onclick="toggleSelectAll()">
-          <button id="delete-selected" onclick="deleteSelectedInvoices()" style="display: none;">Borrar</button>
-        </div>
-      `;
+      invoiceList.innerHTML = '<div id="select-all-container"><input type="checkbox" id="select-all" onclick="toggleSelectAll()"><button id="delete-selected" onclick="deleteSelectedInvoices()" style="display: none;">Borrar</button></div>';
       invoices.filter(invoice => invoice.user === currentUser.email).forEach((invoice, index) => {
         const invoiceItem = document.createElement('div');
         invoiceItem.className = 'invoice-item';
@@ -345,6 +350,7 @@
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
         const sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        console.log(sheetData);
         processInvoices(sheetData);
       };
       reader.readAsArrayBuffer(file);
@@ -364,46 +370,19 @@
             textContent += item.str + ' ';
           });
         }
+        console.log(textContent);
         processInvoices(textContent);
       };
       reader.readAsArrayBuffer(file);
     };
 
     const processInvoices = (data) => {
-      // Process the data to detect the number of invoices and format it accordingly
-      // For demonstration, let's assume we have processed the data into the desired format
+      // Aquí se procesaría la información para detectar el número de facturas y formatearla adecuadamente
+      // Por demostración, asumimos que hemos procesado los datos en el formato deseado
       const formattedData = `
-        Factura: 0002
-        Dia: 19
-        Mes: 05
-        Ano: 2009
-        Fecha Entrega: 19/05/2009
-        Cliente: IQBSS
-        RUC: 
-        PROVINCIA: 
-        CIUDAD: 
-        LISTA PRECIO: 
-        CANAL: 
-        SUB CANAL: 
-        Vendedor: 
-        Cuentas: 
-        Código: BT002
-        Modelo: Millenium S2000 150Ah 12Vdc, 12V, 150Ah
-        Proveedor: DUQUE MORENO LILIANA MARCELA (AXON COMUNICACIONES)
-        Cantidad: 2
-        Costo Unitario: $260.00
-        IVA PAGADO: $62.40
-        TOTAL FACTURADO: $582.40
-        Precio Unitario: $351.00
-        Precio Total: $702.00
-        IVA COBRADO: $84.24
-        TOTAL A FACTURAR: $786.24
-        UTILIDAD: $182.00
-        TOTAL COBRADO: $786.24
-        CRÉDITO: $0.00
-        Condiciones de Crédito: 
-        Pendientes: 
-        Perdido: 
+        NOMBRE: Isidro
+        FECHA: 2024-12-28
+        TOTAL: $1000
       `;
       console.log(formattedData);
     };
@@ -429,7 +408,10 @@
       document.getElementById('home').style.display = 'block';
       document.getElementById('login').style.display = 'none';
       document.getElementById('register').style.display = 'none';
+      document.getElementById('loading-screen').classList.add('hidden'); // Ocultar la pantalla de carga
       renderInvoices();
+    } else {
+      document.getElementById('loading-screen').classList.add('hidden'); // Ocultar la pantalla de carga si no está logueado
     }
 
     document.getElementById('login-form').addEventListener('submit', (event) => {
@@ -477,4 +459,9 @@
     });
 
     window.addEventListener('load', () => {
-      const loadingScreen
+      const loadingScreen = document.getElementById('loading-screen');
+      loadingScreen.classList.add('hidden');
+    });
+  </script>
+</body>
+</html>
