@@ -362,8 +362,36 @@
     const processInvoiceData = (data) => {
       const invoiceData = {
         numeroFactura: data[0][1],
-        fecha: data[1][1],
-        cliente: data[2][1],
+        dia: data[1][1].split('-')[2],
+        mes: data[1][1].split('-')[1],
+        año: data[1][1].split('-')[0],
+        fechaEntrega: data[2][1],
+        cliente: data[3][1],
+        RUC: data[4][1],
+        provincia: data[5][1],
+        ciudad: data[6][1],
+        listaPrecio: data[7][1],
+        canal: data[8][1],
+        subCanal: data[9][1],
+        vendedor: data[10][1],
+        cuentas: data[11][1],
+        codigo: data[12][1],
+        modelo: data[13][1],
+        proveedor: data[14][1],
+        cantidad: data[15][1],
+        costoUnitario: data[16][1],
+        costo: data[17][1],
+        ivaPagado: data[18][1],
+        totalFacturado: data[19][1],
+        precioUnitario: data[20][1],
+        precioTotal: data[21][1],
+        ivaCobrado: data[22][1],
+        totalAFacturar: data[23][1],
+        utilidad: data[24][1],
+        credito: data[25][1],
+        condicionesCredito: data[26][1],
+        pendientes: data[27][1],
+        perdido: data[28][1]
       };
       return invoiceData;
     };
@@ -372,86 +400,31 @@
       const invoiceDisplay = document.getElementById('invoice-display');
       invoiceDisplay.innerHTML = `
         <p>Número de Factura: ${invoiceData.numeroFactura}</p>
-        <p>Fecha: ${invoiceData.fecha}</p>
+        <p>Día: ${invoiceData.dia}</p>
+        <p>Mes: ${invoiceData.mes}</p>
+        <p>Año: ${invoiceData.año}</p>
+        <p>Fecha de Entrega: ${invoiceData.fechaEntrega}</p>
         <p>Cliente: ${invoiceData.cliente}</p>
-      `;
-    };
-
-    const analyzeFile = (file) => {
-      if (file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" || file.type === "application/vnd.ms-excel") {
-        readExcelFile(file);
-      } else if (file.type === "application/pdf") {
-        readPDFFile(file);
-      } else {
-        console.error('Unsupported file type');
-      }
-    };
-
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Delete') {
-        deleteSelectedInvoices();
-      }
-    });
-
-    if (currentUser) {
-      loggedIn = true;
-      document.getElementById('home').style.display = 'block';
-      document.getElementById('login').style.display = 'none';
-      document.getElementById('register').style.display = 'none';
-      document.getElementById('loading-screen').classList.add('hidden');
-      renderInvoices();
-    } else {
-      document.getElementById('loading-screen').classList.add('hidden');
-    }
-
-    document.getElementById('login-form').addEventListener('submit', (event) => {
-      event.preventDefault();
-      const email = document.getElementById('email-login').value;
-      const password = document.getElementById('password-login').value;
-      loginUser(email, password);
-    });
-
-    document.getElementById('register-form').addEventListener('submit', (event) => {
-      event.preventDefault();
-      const name = document.getElementById('name-register').value;
-      const number = document.getElementById('number-register').value;
-      const email = document.getElementById('email-register').value;
-      const password = document.getElementById('password-register').value;
-      registerUser(name, number, email, password);
-    });
-
-    document.getElementById('invoice-form').addEventListener('submit', (event) => {
-      event.preventDefault();
-      const file = document.getElementById('file-upload').files[0];
-      if (file) {
-        analyzeFile(file);
-        const reader = new FileReader();
-        const progressBar = document.getElementById('progress-bar');
-        const button = document.querySelector('.button');
-        reader.onloadstart = () => {
-          button.classList.add('loading');
-          progressBar.style.width = '0';
-        };
-        reader.onprogress = (event) => {
-          if (event.lengthComputable) {
-            const percentLoaded = (event.loaded / event.total) * 100;
-            progressBar.style.width = percentLoaded + '%';
-          }
-        };
-        reader.onloadend = () => {
-          button.classList.remove('loading');
-          progressBar.style.width = '100%';
-          const fileData = reader.result;
-          saveInvoice(fileData);
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
-    window.addEventListener('load', () => {
-      const loadingScreen = document.getElementById('loading-screen');
-      loadingScreen.classList.add('hidden');
-    });
-  </script>
-</body>
-</html>
+        <p>RUC: ${invoiceData.RUC}</p>
+        <p>Provincia: ${invoiceData.provincia}</p>
+        <p>Ciudad: ${invoiceData.ciudad}</p>
+        <p>Lista de Precio: ${invoiceData.listaPrecio}</p>
+        <p>Canal: ${invoiceData.canal}</p>
+        <p>Sub Canal: ${invoiceData.subCanal}</p>
+        <p>Vendedor: ${invoiceData.vendedor}</p>
+        <p>Cuentas: ${invoiceData.cuentas}</p>
+        <p>Código: ${invoiceData.codigo}</p>
+        <p>Modelo: ${invoiceData.modelo}</p>
+        <p>Proveedor: ${invoiceData.proveedor}</p>
+        <p>Cantidad: ${invoiceData.cantidad}</p>
+        <p>Costo Unitario: ${invoiceData.costoUnitario}</p>
+        <p>Costo: ${invoiceData.costo}</p>
+        <p>IVA Pagado: ${invoiceData.ivaPagado}</p>
+        <p>Total Facturado: ${invoiceData.totalFacturado}</p>
+        <p>Precio Unitario: ${invoiceData.precioUnitario}</p>
+        <p>Precio Total: ${invoiceData.precioTotal}</p>
+        <p>IVA Cobrado: ${invoiceData.ivaCobrado}</p>
+        <p>Total a Facturar: ${invoiceData.totalAFacturar}</p>
+        <p>Utilidad: ${invoiceData.utilidad}</p>
+        <p>Crédito: ${invoiceData.credito}</p>
+        <p>Condiciones de Crédito: ${invoiceData.cond
