@@ -233,18 +233,51 @@
       <p id="invoice-success" style="color: green; display: none;" aria-live="polite">Factura guardada exitosamente.</p>
       <p id="invoice-error" style="color: red; display: none;" aria-live="assertive">Hubo un problema al guardar la factura. Intenta de nuevo.</p>
 
-      <div class="invoice-list" id="invoice-list">
-        <div id="select-all-container">
-          <input type="checkbox" id="select-all" onclick="toggleSelectAll()">
-          <button id="delete-selected" onclick="deleteSelectedInvoices()" style="display: none;">Borrar</button>
-        </div>
-      </div>
+      <table id="invoice-table" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+        <thead>
+          <tr>
+            <th>Factura</th>
+            <th>Día</th>
+            <th>Mes</th>
+            <th>Año</th>
+            <th>Fecha Entrega</th>
+            <th>Cliente</th>
+            <th>RUC</th>
+            <th>Provincia</th>
+            <th>Ciudad</th>
+            <th>Lista Precio</th>
+            <th>Canal</th>
+            <th>Sub Canal</th>
+            <th>Vendedor</th>
+            <th>Cuentas</th>
+            <th>Código</th>
+            <th>Modelo</th>
+            <th>Proveedor</th>
+            <th>Cantidad</th>
+            <th>Costo Unitario</th>
+            <th>Costo</th>
+            <th>IVA Pagado</th>
+            <th>Total Facturado</th>
+            <th>Precio Unitario</th>
+            <th>Precio Total</th>
+            <th>IVA Cobrado</th>
+            <th>Total a Facturar</th>
+            <th>Utilidad</th>
+            <th>Crédito</th>
+            <th>Condiciones de Crédito</th>
+            <th>Pendientes</th>
+            <th>Perdido</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Data will be inserted here -->
+        </tbody>
+      </table>
     </section>
   </main>
 
   <div class="search-container">
     <input type="text" id="search-bar" placeholder="Buscar facturas...">
-    <button class="button" onclick="searchInvoices()">Buscar</button>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
@@ -350,7 +383,6 @@
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
         const sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-        console.log(sheetData);
         processInvoices(sheetData);
       };
       reader.readAsArrayBuffer(file);
@@ -370,21 +402,69 @@
             textContent += item.str + ' ';
           });
         }
-        console.log(textContent);
-        processInvoices(textContent);
+        processInvoices(parsePDFData(textContent));
       };
       reader.readAsArrayBuffer(file);
     };
 
+    const parsePDFData = (text) => {
+      const data = [];
+      const rows = text.split('\n');
+      rows.forEach(row => {
+        const columns = row.split(/\s\s+/); // Split by multiple spaces
+        if (columns.length === 31) {
+          const invoice = {
+            'Factura': columns[0],
+            'Día': columns[1],
+            'Mes': columns[2],
+            'Año': columns[3],
+            'Fecha Entrega': columns[4],
+            'Cliente': columns[5],
+            'RUC': columns[6],
+            'Provincia': columns[7],
+            'Ciudad': columns[8],
+            'Lista Precio': columns[9],
+            'Canal': columns[10],
+            'Sub Canal': columns[11],
+            'Vendedor': columns[12],
+            'Cuentas': columns[13],
+            'Código': columns[14],
+            'Modelo': columns[15],
+            'Proveedor': columns[16],
+            'Cantidad': columns[17],
+            'Costo Unitario': columns[18],
+            'Costo': columns[19],
+            'IVA Pagado': columns[20],
+            'Total Facturado': columns[21],
+            'Precio Unitario': columns[22],
+            'Precio Total': columns[23],
+            'IVA Cobrado': columns[24],
+            'Total a Facturar': columns[25],
+            'Utilidad': columns[26],
+            'Crédito': columns[27],
+            'Condiciones de Crédito': columns[28],
+            'Pendientes': columns[29],
+            'Perdido': columns[30]
+          };
+          data.push(invoice);
+        }
+      });
+      return data;
+    };
+
     const processInvoices = (data) => {
-      // Aquí se procesaría la información para detectar el número de facturas y formatearla adecuadamente
-      // Por demostración, asumimos que hemos procesado los datos en el formato deseado
-      const formattedData = `
-        NOMBRE: Isidro
-        FECHA: 2024-12-28
-        TOTAL: $1000
-      `;
-      console.log(formattedData);
+      const tableBody = document.getElementById('invoice-table').getElementsByTagName('tbody')[0];
+      tableBody.innerHTML = '';
+
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        Object.values(row).forEach(value => {
+          const td = document.createElement('td');
+          td.textContent = value;
+          tr.appendChild(td);
+        });
+        tableBody.appendChild(tr);
+      });
     };
 
     const analyzeFile = (file) => {
@@ -408,60 +488,4 @@
       document.getElementById('home').style.display = 'block';
       document.getElementById('login').style.display = 'none';
       document.getElementById('register').style.display = 'none';
-      document.getElementById('loading-screen').classList.add('hidden'); // Ocultar la pantalla de carga
-      renderInvoices();
-    } else {
-      document.getElementById('loading-screen').classList.add('hidden'); // Ocultar la pantalla de carga si no está logueado
-    }
-
-    document.getElementById('login-form').addEventListener('submit', (event) => {
-      event.preventDefault();
-      const email = document.getElementById('email-login').value;
-      const password = document.getElementById('password-login').value;
-      loginUser(email, password);
-    });
-
-    document.getElementById('register-form').addEventListener('submit', (event) => {
-      event.preventDefault();
-      const name = document.getElementById('name-register').value;
-      const number = document.getElementById('number-register').value;
-      const email = document.getElementById('email-register').value;
-      const password = document.getElementById('password-register').value;
-      registerUser(name, number, email, password);
-    });
-
-    document.getElementById('invoice-form').addEventListener('submit', (event) => {
-      event.preventDefault();
-      const file = document.getElementById('file-upload').files[0];
-      if (file) {
-        analyzeFile(file);
-        const reader = new FileReader();
-        const progressBar = document.getElementById('progress-bar');
-        const button = document.querySelector('.button');
-        reader.onloadstart = () => {
-          button.classList.add('loading');
-          progressBar.style.width = '0';
-        };
-        reader.onprogress = (event) => {
-          if (event.lengthComputable) {
-            const percentLoaded = (event.loaded / event.total) * 100;
-            progressBar.style.width = percentLoaded + '%';
-          }
-        };
-        reader.onloadend = () => {
-          button.classList.remove('loading');
-          progressBar.style.width = '100%';
-          const fileData = reader.result;
-          saveInvoice(fileData);
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
-    window.addEventListener('load', () => {
-      const loadingScreen = document.getElementById('loading-screen');
-      loadingScreen.classList.add('hidden');
-    });
-  </script>
-</body>
-</html> 
+      document
