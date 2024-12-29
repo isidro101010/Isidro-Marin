@@ -67,9 +67,9 @@ def process_excel(file_path):
         'Factura', 'Día', 'Mes', 'Año', 'Fecha Entrega', 'Cliente', 'RUC',
         'Provincia', 'Ciudad', 'Lista Precio', 'Canal', 'Sub Canal', 'Vendedor',
         'Cuentas', 'Código', 'Modelo', 'Proveedor', 'Cantidad', 'Costo Unitario',
-        'Costo', 'IVA Pagado', 'Total Facturado', 'Precio Unitario',
-        'Precio Total', 'IVA Cobrado', 'Total a Facturar', 'Utilidad',
-        'Crédito', 'Condiciones de Crédito', 'Pendientes', 'Perdido'
+        'IVA Pagado', 'Total Facturado', 'Precio Unitario', 'Precio Total', 'IVA Cobrado',
+        'Total a Facturar', 'Utilidad', 'Total Cobrado', 'Crédito', 'Condiciones de Crédito',
+        'Pendientes', 'Perdido'
     ]
     df = df.reindex(columns=columns, fill_value='N/A')
     data = df.to_dict(orient='records')
