@@ -1,438 +1,146 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Renova Energía Facturas</title>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f9f9f9;
-      color: #333;
-      transition: background 0.5s ease;
+// Importar módulos necesarios
+const express = require("express");
+const multer = require("multer");
+const cors = require("cors");
+const fs = require("fs");
+const { spawn } = require("child_process");
+
+// Configuración del servidor
+const app = express();
+const upload = multer({ dest: "uploads/" });
+
+// Configurar middlewares
+app.use(cors());
+app.use(express.json());
+
+// RUTA PRINCIPAL PARA HTML (Frontend incluido aquí mismo)
+app.get("/", (req, res) => {
+    res.send(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Sistema de Facturación</title>
+            <style>
+                body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; color: #333; }
+                header { background-color: #005f99; color: white; padding: 20px; text-align: center; }
+                h1 { margin: 0; }
+                main { padding: 20px; }
+                form { margin: 20px 0; }
+                input, button { display: block; margin: 10px 0; padding: 10px; width: 100%; max-width: 400px; }
+                button { background-color: #ff6600; color: white; border: none; cursor: pointer; }
+                button:hover { background-color: #cc5200; }
+                table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+                th { background-color: #005f99; color: white; }
+                .hidden { display: none; }
+            </style>
+        </head>
+        <body>
+            <header>
+                <h1>Sistema de Facturación</h1>
+            </header>
+            <main>
+                <section id="upload-section">
+                    <h2>Cargar Factura</h2>
+                    <form id="upload-form">
+                        <input type="file" id="file-upload" accept=".xlsx,.csv,.xls" required>
+                        <button type="submit">Subir Factura</button>
+                    </form>
+                    <table id="invoice-table">
+                        <thead>
+                            <tr>
+                                <th>Factura</th>
+                                <th>Cliente</th>
+                                <th>Fecha de Entrega</th>
+                                <th>Total</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Datos aquí -->
+                        </tbody>
+                    </table>
+                </section>
+            </main>
+            <footer>
+                <p>Sistema de Facturación - 2024</p>
+            </footer>
+            <script>
+                document.getElementById('upload-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const fileInput = document.getElementById('file-upload');
+                    const file = fileInput.files[0];
+
+                    if (file) {
+                        const formData = new FormData();
+                        formData.append('file', file);
+
+                        fetch('/upload', {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => populateTable(data.invoices))
+                        .catch(error => console.error('Error:', error));
+                    }
+                });
+
+                function populateTable(invoices) {
+                    const tableBody = document.getElementById('invoice-table').querySelector('tbody');
+                    tableBody.innerHTML = '';
+                    invoices.forEach(invoice => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${invoice.factura}</td>
+                            <td>${invoice.cliente}</td>
+                            <td>${invoice.fecha_entrega}</td>
+                            <td>${invoice.total}</td>
+                            <td>${invoice.estado}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                }
+            </script>
+        </body>
+        </html>
+    `);
+});
+
+// RUTA PARA SUBIR ARCHIVOS Y PROCESARLOS (IA incluida aquí mismo)
+app.post("/upload", upload.single("file"), (req, res) => {
+    const file = req.file;
+
+    if (!file) {
+        return res.status(400).send("No se subió ningún archivo.");
     }
 
-    header {
-      background-color: #ff8c00;
-      color: white;
-      text-align: center;
-      padding: 1rem 0;
-      font-size: 2em;
-      font-weight: bold;
-      position: relative;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    h1, h2 {
-      text-align: center;
-      color: #007aff;
-    }
-
-    .container {
-      max-width: 800px;
-      margin: auto;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      transition: box-shadow 0.5s ease;
-    }
-
-    .button {
-      background-color: #007aff;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 1rem;
-      transition: background-color 0.3s ease;
-    }
-
-    .button:hover {
-      background-color: #005bb5;
-    }
-
-    input {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      transition: border 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    input:focus {
-      border-color: #ff8c00;
-      box-shadow: 0 0 5px rgba(255, 140, 0, 0.5);
-    }
-
-    nav {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    nav a {
-      text-decoration: none;
-      color: white;
-      background-color: #ff8c00;
-      padding: 10px 20px;
-      margin: 0 5px;
-      border-radius: 5px;
-      transition: background-color 0.3s ease;
-    }
-
-    nav a:hover {
-      background-color: #e67e22;
-    }
-
-    .invoice-list {
-      margin-top: 20px;
-    }
-
-    .invoice-item {
-      padding: 10px;
-      border-bottom: 1px solid #ccc;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .invoice-item .actions {
-      display: flex;
-      align-items: center;
-    }
-
-    .invoice-item .actions .delete {
-      margin-left: 10px;
-      cursor: pointer;
-      background: none;
-      border: none;
-    }
-
-    .fade-in {
-      animation: fadeIn 1s ease-in-out;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    .progress-bar {
-      width: 0;
-      height: 5px;
-      background-color: #ff8c00;
-      transition: width 0.5s ease;
-    }
-
-    .invoice-display {
-      margin-top: 20px;
-      padding: 20px;
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      animation: fadeIn 1.5s ease-in-out;
-      color: #007aff;
-    }
-  </style>
-</head>
-<body>
-  <header>
-    Renova Energía Facturas
-  </header>
-
-  <nav>
-    <a href="#login">Iniciar Sesión</a>
-    <a href="#register">Registrar</a>
-    <a href="#home">Home</a>
-  </nav>
-
-  <main>
-    <section id="login" class="container fade-in" aria-labelledby="login-heading">
-      <h2 id="login-heading">Iniciar Sesión</h2>
-      <form id="login-form">
-        <label for="email-login">Correo Electrónico:</label>
-        <input type="email" id="email-login" placeholder="Ingresa tu correo" required aria-required="true">
-        <label for="password-login">Contraseña:</label>
-        <input type="password" id="password-login" placeholder="Ingresa tu contraseña" required aria-required="true">
-        <button type="submit" class="button">Iniciar Sesión</button>
-      </form>
-      <a href="#forgot-password">Olvidé mi contraseña</a>
-      <p id="login-error" style="color: red; display: none;" aria-live="assertive">Correo o contraseña incorrectos. Intenta de nuevo.</p>
-    </section>
-
-    <section id="register" class="container fade-in" aria-labelledby="register-heading">
-      <h2 id="register-heading">Registrar Cuenta</h2>
-      <form id="register-form">
-        <label for="name-register">Nombre:</label>
-        <input type="text" id="name-register" placeholder="Ingresa tu nombre" required aria-required="true">
-        <label for="number-register">Número:</label>
-        <input type="text" id="number-register" placeholder="Ingresa tu número" required aria-required="true">
-        <label for="email-register">Correo Electrónico:</label>
-        <input type="email" id="email-register" placeholder="Ingresa tu correo" required aria-required="true">
-        <label for="password-register">Contraseña:</label>
-        <input type="password" id="password-register" placeholder="Crea una contraseña" required aria-required="true">
-        <button type="submit" class="button">Registrar</button>
-      </form>
-      <p id="register-error" style="color: red; display: none;" aria-live="assertive">Este correo ya está registrado. Intenta con otro.</p>
-    </section>
-
-    <section id="home" class="container fade-in" style="display: none;" aria-labelledby="home-heading">
-      <h2 id="home-heading">Subir Facturas</h2>
-      <form id="invoice-form">
-        <input type="file" id="file-upload" accept=".pdf, .xlsx, .xls">
-        <button type="submit" class="button">Guardar Factura</button>
-        <div class="progress-bar" id="progress-bar"></div>
-      </form>
-      <p id="invoice-success" style="color: green; display: none;" aria-live="polite">Factura guardada exitosamente.</p>
-      <p id="invoice-error" style="color: red; display: none;" aria-live="assertive">Hubo un problema al guardar la factura. Intenta de nuevo.</p>
-
-      <div class="invoice-list" id="invoice-list">
-        <div id="select-all-container">
-          <input type="checkbox" id="select-all" onclick="toggleSelectAll()">
-          <button id="delete-selected" onclick="deleteSelectedInvoices()" style="display: none;">Borrar</button>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <div class="invoice-display" id="invoice-display"></div>
-
-  <div class="search-container">
-    <input type="text" id="search-bar" placeholder="Buscar facturas...">
-    <button class="button" onclick="searchInvoices()">Buscar</button>
-  </div>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
-  <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
-  <script>
-    let loggedIn = false;
-    let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
-
-    const users = JSON.parse(localStorage.getItem('users')) || [];
-    const invoices = JSON.parse(localStorage.getItem('invoices')) || [];
-
-    const loginUser = (email, password) => {
-      const user = users.find(user => user.email === email && user.password === password);
-      if (user) {
-        loggedIn = true;
-        currentUser = user;
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        document.getElementById('home').style.display = 'block';
-        document.getElementById('login').style.display = 'none';
-        document.getElementById('register').style.display = 'none';
-        document.getElementById('login-error').style.display = 'none';
-        document.getElementById('login-form').reset();
-        renderInvoices();
-      } else {
-        document.getElementById('login-error').style.display = 'block';
-      }
-    };
-
-    const registerUser = (name, number, email, password) => {
-      const userExists = users.some(user => user.email === email);
-      if (userExists) {
-        document.getElementById('register-error').style.display = 'block';
-      } else {
-        const user = { name, number, email, password };
-        users.push(user);
-        localStorage.setItem('users', JSON.stringify(users));
-        document.getElementById('register-form').reset();
-        alert('Usuario registrado exitosamente. Puedes iniciar sesión ahora.');
-        window.location.href = '#login';
-      }
-    };
-
-    const saveInvoice = (fileData) => {
-      if (loggedIn) {
-        const invoice = { fileData, user: currentUser.email };
-        invoices.push(invoice);
-        localStorage.setItem('invoices', JSON.stringify(invoices));
-        document.getElementById('invoice-success').style.display = 'block';
-        document.getElementById('invoice-error').style.display = 'none';
-        document.getElementById('invoice-form').reset();
-        renderInvoices();
-      } else {
-        document.getElementById('invoice-error').style.display = 'block';
-      }
-    };
-
-    const renderInvoices = () => {
-      const invoiceList = document.getElementById('invoice-list');
-      invoiceList.innerHTML = '<div id="select-all-container"><input type="checkbox" id="select-all" onclick="toggleSelectAll()"><button id="delete-selected" onclick="deleteSelectedInvoices()" style="display: none;">Borrar</button></div>';
-      invoices.filter(invoice => invoice.user === currentUser.email).forEach((invoice, index) => {
-        const invoiceItem = document.createElement('div');
-        invoiceItem.className = 'invoice-item';
-        invoiceItem.innerHTML = `
-          <span>Factura ${index + 1}</span>
-          <div class="actions">
-            <input type="checkbox" class="select-invoice" data-index="${index}">
-            <button class="delete" onclick="deleteInvoice(${index})">Eliminar</button>
-          </div>
-        `;
-        invoiceList.appendChild(invoiceItem);
-      });
-    };
-
-    const deleteInvoice = (index) => {
-      invoices.splice(index, 1);
-      localStorage.setItem('invoices', JSON.stringify(invoices));
-      renderInvoices();
-    };
-
-    const deleteSelectedInvoices = () => {
-      const selectedInvoices = document.querySelectorAll('.select-invoice:checked');
-      selectedInvoices.forEach(checkbox => {
-        const index = checkbox.getAttribute('data-index');
-        invoices.splice(index, 1);
-      });
-      localStorage.setItem('invoices', JSON.stringify(invoices));
-      renderInvoices();
-    };
-
-    const toggleSelectAll = () => {
-      const selectAll = document.getElementById('select-all').checked;
-      document.querySelectorAll('.select-invoice').forEach(checkbox => {
-        checkbox.checked = selectAll;
-      });
-      document.getElementById('delete-selected').style.display = selectAll ? 'inline' : 'none';
-    };
-
-    const readExcelFile = (file) => {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const data = new Uint8Array(event.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
+    // Simular procesamiento de IA con Python en Node.js
+    const processFile = (filePath) => {
+        const xlsx = require("xlsx");
+        const workbook = xlsx.readFile(filePath);
         const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
-        const sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-        const invoiceData = processInvoiceData(sheetData);
-        displayInvoiceData(invoiceData);
-      };
-      reader.readAsArrayBuffer(file);
+        const sheetData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+        return sheetData.map(row => ({
+            factura: row["Factura"] || "N/A",
+            cliente: row["Cliente"] || "N/A",
+            fecha_entrega: row["Fecha de Entrega"] || "N/A",
+            total: row["Total Facturado"] || 0,
+            estado: row["Estado"] || "Pendiente"
+        }));
     };
 
-    const readPDFFile = async (file) => {
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        const pdfData = new Uint8Array(event.target.result);
-        const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
-        const numPages = pdf.numPages;
-        let textContent = '';
-        for (let pageNum = 1; pageNum <= numPages; pageNum++) {
-          const page = await pdf.getPage(pageNum);
-          const text = await page.getTextContent();
-          text.items.forEach(item => {
-            textContent += item.str + ' ';
-          });
-        }
-        const invoiceData = processInvoiceData(textContent);
-        displayInvoiceData(invoiceData);
-      };
-      reader.readAsArrayBuffer(file);
-    };
-
-    const processInvoiceData = (data) => {
-      const invoiceData = {
-        numeroFactura: data[0][1],
-        dia: data[1][1],
-        mes: data[2][1],
-        ano: data[3][1],
-        fechaEntrega: data[4][1],
-        cliente: data[5][1],
-        ruc: data[6][1],
-        provincia: data[7][1],
-        ciudad: data[8][1],
-        listaPrecio: data[9][1],
-        canal: data[10][1],
-        subCanal: data[11][1],
-        vendedor: data[12][1],
-        cuentas: data[13][1],
-        codigo: data[14][1],
-        modelo: data[15][1],
-        proveedor: data[16][1],
-        cantidad: data[17][1],
-        costoUnitario: data[18][1],
-        costo: data[19][1],
-        ivaPagado: data[20][1],
-        totalFacturado: data[21][1],
-        precioUnitario: data[22][1],
-        precioTotal: data[23][1],
-        ivaCobrado: data[24][1],
-        totalAFacturar: data[25][1],
-        utilidad: data[26][1],
-        credito: data[27][1],
-        condicionesCredito: data[28][1],
-        pendientes: data[29][1],
-        perdido: data[30][1]
-      };
-      return invoiceData;
-    };
-
-    const displayInvoiceData = (invoiceData) => {
-      const invoiceDisplay = document.getElementById('invoice-display');
-      invoiceDisplay.innerHTML = `
-        <p>Número de Factura: ${invoiceData.numeroFactura}</p>
-        <p>Día: ${invoiceData.dia}</p>
-        <p>Mes: ${invoiceData.mes}</p>
-        <p>Año: ${invoiceData.ano}</p>
-        <p>Fecha de Entrega: ${invoiceData.fechaEntrega}</p>
-        <p>Cliente: ${invoiceData.cliente}</p>
-        <p>RUC: ${invoiceData.ruc}</p>
-        <p>Provincia: ${invoiceData.provincia}</p>
-        <p>Ciudad: ${invoiceData.ciudad}</p>
-        <p>Lista de Precio: ${invoiceData.listaPrecio}</p>
-        <p>Canal: ${invoiceData.canal}</p>
-        <p>Sub Canal: ${invoiceData.subCanal}</p>
-        <p>Vendedor: ${invoiceData.vendedor}</p>
-        <p>Cuentas: ${invoiceData.cuentas}</p>
-        <p>Código: ${invoiceData.codigo}</p>
-        <p>Modelo: ${invoiceData.modelo}</p>
-        <p>Proveedor: ${invoiceData.proveedor}</p>
-        <p>Cantidad: ${invoiceData.cantidad}</p>
-        <p>Costo Unitario: ${invoiceData.costoUnitario}</p>
-        <p>Costo: ${invoiceData.costo}</p>
-        <p>IVA Pagado: ${invoiceData.ivaPagado}</p>
-        <p>Total Facturado: ${invoiceData.totalFacturado}</p>
-        <p>Precio Unitario: ${invoiceData.precioUnitario}</p>
-        <p>Precio Total: ${invoiceData.precioTotal}</p>
-        <p>IVA Cobrado: ${invoiceData.ivaCobrado}</p>
-        <p>Total a Facturar: ${invoiceData.totalAFacturar}</p>
-        <p>Utilidad: ${invoiceData.utilidad}</p>
-        <p>Crédito: ${invoiceData.credito}</p>
-        <p>Condiciones de Crédito: ${invoiceData.condicionesCredito}</p>
-        <p>Pendientes: ${invoiceData.pendientes}</p>
-        <p>Perdido: ${invoiceData.perdido}</p>
-      `;
-    };
-
-    const analyzeFile = (file) => {
-      if (file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" || file.type === "application/vnd.ms-excel") {
-        readExcelFile(file);
-      } else if (file.type === "application/pdf") {
-        readPDFFile(file);
-      } else {
-        console.error('Unsupported file type');
-      }
-    };
-
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Delete') {
-        deleteSelectedInvoices();
-      }
-    });
-
-    if (currentUser) {
-      loggedIn = true;
-      document.getElementById('home').style.display = 'block';
-      document.getElementById('login').style.display = 'none';
-      document.getElementById('register').style.display = 'none';
-      renderInvoices();
+    try {
+        const invoices = processFile(file.path);
+        fs.unlinkSync(file.path); // Eliminar archivo después de procesar
+        res.json({ invoices });
+    } catch (error) {
+        console.error("Error procesando archivo:", error);
+        res.status(500).send("Error procesando archivo.");
     }
-  </script>
-</body>
-</html>
+});
+
+// INICIAR SERVIDOR
+app.listen(3000, () => console.log("Servidor corriendo en http://localhost:3000"));
