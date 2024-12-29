@@ -362,36 +362,36 @@
     const processInvoiceData = (data) => {
       const invoiceData = {
         numeroFactura: data[0][1],
-        dia: data[1][1].split('-')[2],
-        mes: data[1][1].split('-')[1],
-        año: data[1][1].split('-')[0],
-        fechaEntrega: data[2][1],
-        cliente: data[3][1],
-        RUC: data[4][1],
-        provincia: data[5][1],
-        ciudad: data[6][1],
-        listaPrecio: data[7][1],
-        canal: data[8][1],
-        subCanal: data[9][1],
-        vendedor: data[10][1],
-        cuentas: data[11][1],
-        codigo: data[12][1],
-        modelo: data[13][1],
-        proveedor: data[14][1],
-        cantidad: data[15][1],
-        costoUnitario: data[16][1],
-        costo: data[17][1],
-        ivaPagado: data[18][1],
-        totalFacturado: data[19][1],
-        precioUnitario: data[20][1],
-        precioTotal: data[21][1],
-        ivaCobrado: data[22][1],
-        totalAFacturar: data[23][1],
-        utilidad: data[24][1],
-        credito: data[25][1],
-        condicionesCredito: data[26][1],
-        pendientes: data[27][1],
-        perdido: data[28][1]
+        dia: data[1][1],
+        mes: data[2][1],
+        ano: data[3][1],
+        fechaEntrega: data[4][1],
+        cliente: data[5][1],
+        ruc: data[6][1],
+        provincia: data[7][1],
+        ciudad: data[8][1],
+        listaPrecio: data[9][1],
+        canal: data[10][1],
+        subCanal: data[11][1],
+        vendedor: data[12][1],
+        cuentas: data[13][1],
+        codigo: data[14][1],
+        modelo: data[15][1],
+        proveedor: data[16][1],
+        cantidad: data[17][1],
+        costoUnitario: data[18][1],
+        costo: data[19][1],
+        ivaPagado: data[20][1],
+        totalFacturado: data[21][1],
+        precioUnitario: data[22][1],
+        precioTotal: data[23][1],
+        ivaCobrado: data[24][1],
+        totalAFacturar: data[25][1],
+        utilidad: data[26][1],
+        credito: data[27][1],
+        condicionesCredito: data[28][1],
+        pendientes: data[29][1],
+        perdido: data[30][1]
       };
       return invoiceData;
     };
@@ -402,10 +402,10 @@
         <p>Número de Factura: ${invoiceData.numeroFactura}</p>
         <p>Día: ${invoiceData.dia}</p>
         <p>Mes: ${invoiceData.mes}</p>
-        <p>Año: ${invoiceData.año}</p>
+        <p>Año: ${invoiceData.ano}</p>
         <p>Fecha de Entrega: ${invoiceData.fechaEntrega}</p>
         <p>Cliente: ${invoiceData.cliente}</p>
-        <p>RUC: ${invoiceData.RUC}</p>
+        <p>RUC: ${invoiceData.ruc}</p>
         <p>Provincia: ${invoiceData.provincia}</p>
         <p>Ciudad: ${invoiceData.ciudad}</p>
         <p>Lista de Precio: ${invoiceData.listaPrecio}</p>
@@ -427,4 +427,26 @@
         <p>Total a Facturar: ${invoiceData.totalAFacturar}</p>
         <p>Utilidad: ${invoiceData.utilidad}</p>
         <p>Crédito: ${invoiceData.credito}</p>
-        <p>Condiciones de Crédito: ${invoiceData.cond
+        <p>Condiciones de Crédito: ${invoiceData.condicionesCredito}</p>
+        <p>Pendientes: ${invoiceData.pendientes}</p>
+        <p>Perdido: ${invoiceData.perdido}</p>
+      `;
+    };
+
+    const analyzeFile = (file) => {
+      if (file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" || file.type === "application/vnd.ms-excel") {
+        readExcelFile(file);
+      } else if (file.type === "application/pdf") {
+        readPDFFile(file);
+      } else {
+        console.error('Unsupported file type');
+      }
+    };
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Delete') {
+        deleteSelectedInvoices();
+      }
+    });
+
+    if (current
