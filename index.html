@@ -1,87 +1,467 @@
-from flask import Flask, request, jsonify, render_template, session, redirect, url_for
-import pandas as pd
-import pdfplumber
-import os
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Renova Energía Facturas</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f9f9f9;
+      color: #333;
+      transition: background 0.5s ease;
+    }
 
-app = Flask(__name__)
-app.secret_key = 'your_secret_key'
-UPLOAD_FOLDER = 'uploads'
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+    header {
+      background-color: #ff8c00;
+      color: white;
+      text-align: center;
+      padding: 1rem 0;
+      font-size: 2em;
+      font-weight: bold;
+      position: relative;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
 
-# Dummy user database for demonstration
-users = {'admin@example.com': {'password': 'admin123', 'name': 'Admin'}}
+    h1, h2 {
+      text-align: center;
+      color: #007aff;
+    }
 
-@app.route('/')
-def index():
-    if 'user' in session:
-        return render_template('home.html', user=session['user'])
-    return render_template('index.html')
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: box-shadow 0.5s ease;
+    }
 
-@app.route('/login', methods=['POST'])
-def login():
-    email = request.form.get('email')
-    password = request.form.get('password')
-    user = users.get(email)
-    if user and user['password'] == password:
-        session['user'] = user
-        return redirect(url_for('index'))
-    return render_template('index.html', error='Invalid credentials')
+    .button {
+      background-color: #007aff;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
 
-@app.route('/logout')
-def logout():
-    session.pop('user', None)
-    return redirect(url_for('index'))
+    .button:hover {
+      background-color: #005bb5;
+    }
 
-@app.route('/register', methods=['POST'])
-def register():
-    email = request.form.get('email')
-    password = request.form.get('password')
-    name = request.form.get('name')
-    if email in users:
-        return render_template('index.html', error='User already exists')
-    users[email] = {'password': password, 'name': name}
-    return redirect(url_for('index'))
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      transition: border 0.3s ease, box-shadow 0.3s ease;
+    }
 
-@app.route('/upload', methods=['POST'])
-def upload_file():
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file uploaded'}), 400
+    input:focus {
+      border-color: #ff8c00;
+      box-shadow: 0 0 5px rgba(255, 140, 0, 0.5);
+    }
 
-    file = request.files['file']
-    file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-    file.save(file_path)
+    nav {
+      text-align: center;
+      margin-bottom: 20px;
+    }
 
-    if file.filename.endswith('.xlsx') or file.filename.endswith('.xls'):
-        data = process_excel(file_path)
-    elif file.filename.endswith('.pdf'):
-        data = process_pdf(file_path)
-    else:
-        return jsonify({'error': 'Unsupported file type'}), 400
+    nav a {
+      text-decoration: none;
+      color: white;
+      background-color: #ff8c00;
+      padding: 10px 20px;
+      margin: 0 5px;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
 
-    return render_template('data.html', data=data)
+    nav a:hover {
+      background-color: #e67e22;
+    }
 
-def process_excel(file_path):
-    df = pd.read_excel(file_path)
-    columns = [
-        'Factura', 'Día', 'Mes', 'Año', 'Fecha Entrega', 'Cliente', 'RUC',
-        'Provincia', 'Ciudad', 'Lista Precio', 'Canal', 'Sub Canal', 'Vendedor',
-        'Cuentas', 'Código', 'Modelo', 'Proveedor', 'Cantidad', 'Costo Unitario',
-        'IVA Pagado', 'Total Facturado', 'Precio Unitario', 'Precio Total', 'IVA Cobrado',
-        'Total a Facturar', 'Utilidad', 'Total Cobrado', 'Crédito', 'Condiciones de Crédito',
-        'Pendientes', 'Perdido'
-    ]
-    df = df.reindex(columns=columns, fill_value='N/A')
-    data = df.to_dict(orient='records')
-    return data
+    .invoice-list {
+      margin-top: 20px;
+    }
 
-def process_pdf(file_path):
-    extracted_data = []
-    with pdfplumber.open(file_path) as pdf:
-        for page in pdf.pages:
-            text = page.extract_text()
-            extracted_data.append({'page_text': text})
-    return extracted_data
+    .invoice-item {
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-if __name__ == '__main__':
-    app.run(debug=True)
+    .invoice-item .actions {
+      display: flex;
+      align-items: center;
+    }
+
+    .invoice-item .actions .delete {
+      margin-left: 10px;
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+
+    .fade-in {
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s ease;
+    }
+
+    .loading-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 5px;
+      background-color: #ff8c00;
+      transition: width 0.5s ease;
+    }
+
+    /* Decoraciones adicionales */
+    .solar-panel {
+      width: 100px;
+      height: 100px;
+      background: url('url-to-solar-panel-image.png') no-repeat center center;
+      background-size: cover;
+      margin: 10px auto;
+    }
+
+    .sun {
+      width: 50px;
+      height: 50px;
+      background: url('url-to-sun-image.png') no-repeat center center;
+      background-size: cover;
+      margin: 10px auto;
+    }
+
+    .house {
+      width: 100px;
+      height: 100px;
+      background: url('url-to-house-image.png') no-repeat center center;
+      background-size: cover;
+      margin: 10px auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="loading-screen" id="loading-screen">
+    <h1>Cargando...</h1>
+  </div>
+
+  <header>
+    Renova Energía Facturas
+  </header>
+
+  <nav>
+    <a href="#login">Iniciar Sesión</a>
+    <a href="#register">Registrar</a>
+    <a href="#home">Home</a>
+  </nav>
+
+  <main>
+    <div class="solar-panel"></div>
+    <div class="sun"></div>
+    <div class="house"></div>
+
+    <section id="login" class="container fade-in" aria-labelledby="login-heading">
+      <h2 id="login-heading">Iniciar Sesión</h2>
+      <form id="login-form">
+        <label for="email-login">Correo Electrónico:</label>
+        <input type="email" id="email-login" placeholder="Ingresa tu correo" required aria-required="true">
+        <label for="password-login">Contraseña:</label>
+        <input type="password" id="password-login" placeholder="Ingresa tu contraseña" required aria-required="true">
+        <button type="submit" class="button">Iniciar Sesión</button>
+      </form>
+      <a href="#forgot-password">Olvidé mi contraseña</a>
+      <p id="login-error" style="color: red; display: none;" aria-live="assertive">Correo o contraseña incorrectos. Intenta de nuevo.</p>
+    </section>
+
+    <section id="register" class="container fade-in" aria-labelledby="register-heading">
+      <h2 id="register-heading">Registrar Cuenta</h2>
+      <form id="register-form">
+        <label for="name-register">Nombre:</label>
+        <input type="text" id="name-register" placeholder="Ingresa tu nombre" required aria-required="true">
+        <label for="number-register">Número:</label>
+        <input type="text" id="number-register" placeholder="Ingresa tu número" required aria-required="true">
+        <label for="email-register">Correo Electrónico:</label>
+        <input type="email" id="email-register" placeholder="Ingresa tu correo" required aria-required="true">
+        <label for="password-register">Contraseña:</label>
+        <input type="password" id="password-register" placeholder="Crea una contraseña" required aria-required="true">
+        <button type="submit" class="button">Registrar</button>
+      </form>
+      <p id="register-error" style="color: red; display: none;" aria-live="assertive">Este correo ya está registrado. Intenta con otro.</p>
+    </section>
+
+    <section id="home" class="container fade-in" style="display: none;" aria-labelledby="home-heading">
+      <h2 id="home-heading">Subir Facturas</h2>
+      <form id="invoice-form">
+        <input type="file" id="file-upload" accept=".pdf, .xlsx, .xls">
+        <button type="submit" class="button">Guardar Factura</button>
+        <div class="progress-bar" id="progress-bar"></div>
+      </form>
+      <p id="invoice-success" style="color: green; display: none;" aria-live="polite">Factura guardada exitosamente.</p>
+      <p id="invoice-error" style="color: red; display: none;" aria-live="assertive">Hubo un problema al guardar la factura. Intenta de nuevo.</p>
+
+      <div class="invoice-list" id="invoice-list">
+        <div id="select-all-container">
+          <input type="checkbox" id="select-all" onclick="toggleSelectAll()">
+          <button id="delete-selected" onclick="deleteSelectedInvoices()" style="display: none;">Borrar</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="search-container">
+    <input type="text" id="search-bar" placeholder="Buscar facturas...">
+    <button class="button" onclick="searchInvoices()">Buscar</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+  <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
+  <script>
+    let loggedIn = false;
+    let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const invoices = JSON.parse(localStorage.getItem('invoices')) || [];
+
+    const loginUser = (email, password) => {
+      const user = users.find(user => user.email === email && user.password === password);
+      if (user) {
+        loggedIn = true;
+        currentUser = user;
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        document.getElementById('home').style.display = 'block';
+        document.getElementById('login').style.display = 'none';
+        document.getElementById('register').style.display = 'none';
+        document.getElementById('login-error').style.display = 'none';
+        document.getElementById('login-form').reset();
+        renderInvoices();
+      } else {
+        document.getElementById('login-error').style.display = 'block';
+      }
+    };
+
+    const registerUser = (name, number, email, password) => {
+      const userExists = users.some(user => user.email === email);
+      if (userExists) {
+        document.getElementById('register-error').style.display = 'block';
+      } else {
+        const user = { name, number, email, password };
+        users.push(user);
+        localStorage.setItem('users', JSON.stringify(users));
+        document.getElementById('register-form').reset();
+        alert('Usuario registrado exitosamente. Puedes iniciar sesión ahora.');
+        window.location.href = '#login';
+      }
+    };
+
+    const saveInvoice = (fileData) => {
+      if (loggedIn) {
+        const invoice = { fileData, user: currentUser.email };
+        invoices.push(invoice);
+        localStorage.setItem('invoices', JSON.stringify(invoices));
+        document.getElementById('invoice-success').style.display = 'block';
+        document.getElementById('invoice-error').style.display = 'none';
+        document.getElementById('invoice-form').reset();
+        renderInvoices();
+      } else {
+        document.getElementById('invoice-error').style.display = 'block';
+      }
+    };
+
+    const renderInvoices = () => {
+      const invoiceList = document.getElementById('invoice-list');
+      invoiceList.innerHTML = '<div id="select-all-container"><input type="checkbox" id="select-all" onclick="toggleSelectAll()"><button id="delete-selected" onclick="deleteSelectedInvoices()" style="display: none;">Borrar</button></div>';
+      invoices.filter(invoice => invoice.user === currentUser.email).forEach((invoice, index) => {
+        const invoiceItem = document.createElement('div');
+        invoiceItem.className = 'invoice-item';
+        invoiceItem.innerHTML = `
+          <span>Factura ${index + 1}</span>
+          <div class="actions">
+            <input type="checkbox" class="select-invoice" data-index="${index}">
+            <button class="delete" onclick="deleteInvoice(${index})">Eliminar</button>
+          </div>
+        `;
+        invoiceList.appendChild(invoiceItem);
+      });
+    };
+
+    const deleteInvoice = (index) => {
+      invoices.splice(index, 1);
+      localStorage.setItem('invoices', JSON.stringify(invoices));
+      renderInvoices();
+    };
+
+    const deleteSelectedInvoices = () => {
+      const selectedInvoices = document.querySelectorAll('.select-invoice:checked');
+      selectedInvoices.forEach(checkbox => {
+        const index = checkbox.getAttribute('data-index');
+        invoices.splice(index, 1);
+      });
+      localStorage.setItem('invoices', JSON.stringify(invoices));
+      renderInvoices();
+    };
+
+    const toggleSelectAll = () => {
+      const selectAll = document.getElementById('select-all').checked;
+      document.querySelectorAll('.select-invoice').forEach(checkbox => {
+        checkbox.checked = selectAll;
+      });
+      document.getElementById('delete-selected').style.display = selectAll ? 'inline' : 'none';
+    };
+
+    const readExcelFile = (file) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const data = new Uint8Array(event.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        console.log(sheetData);
+        processInvoices(sheetData);
+      };
+      reader.readAsArrayBuffer(file);
+    };
+
+    const readPDFFile = async (file) => {
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const pdfData = new Uint8Array(event.target.result);
+        const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
+        const numPages = pdf.numPages;
+        let textContent = '';
+        for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+          const page = await pdf.getPage(pageNum);
+          const text = await page.getTextContent();
+          text.items.forEach(item => {
+            textContent += item.str + ' ';
+          });
+        }
+        console.log(textContent);
+        processInvoices(textContent);
+      };
+      reader.readAsArrayBuffer(file);
+    };
+
+    const processInvoices = (data) => {
+      // Aquí se procesaría la información para detectar el número de facturas y formatearla adecuadamente
+      // Por demostración, asumimos que hemos procesado los datos en el formato deseado
+      const formattedData = `
+        NOMBRE: Isidro
+        FECHA: 2024-12-28
+        TOTAL: $1000
+      `;
+      console.log(formattedData);
+    };
+
+    const analyzeFile = (file) => {
+      if (file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" || file.type === "application/vnd.ms-excel") {
+        readExcelFile(file);
+      } else if (file.type === "application/pdf") {
+        readPDFFile(file);
+      } else {
+        console.error('Unsupported file type');
+      }
+    };
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Delete') {
+        deleteSelectedInvoices();
+      }
+    });
+
+    if (currentUser) {
+      loggedIn = true;
+      document.getElementById('home').style.display = 'block';
+      document.getElementById('login').style.display = 'none';
+      document.getElementById('register').style.display = 'none';
+      document.getElementById('loading-screen').classList.add('hidden'); // Ocultar la pantalla de carga
+      renderInvoices();
+    } else {
+      document.getElementById('loading-screen').classList.add('hidden'); // Ocultar la pantalla de carga si no está logueado
+    }
+
+    document.getElementById('login-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const email = document.getElementById('email-login').value;
+      const password = document.getElementById('password-login').value;
+      loginUser(email, password);
+    });
+
+    document.getElementById('register-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const name = document.getElementById('name-register').value;
+      const number = document.getElementById('number-register').value;
+      const email = document.getElementById('email-register').value;
+      const password = document.getElementById('password-register').value;
+      registerUser(name, number, email, password);
+    });
+
+    document.getElementById('invoice-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const file = document.getElementById('file-upload').files[0];
+      if (file) {
+        analyzeFile(file);
+        const reader = new FileReader();
+        const progressBar = document.getElementById('progress-bar');
+        const button = document.querySelector('.button');
+        reader.onloadstart = () => {
+          button.classList.add('loading');
+          progressBar.style.width = '0';
+        };
+        reader.onprogress = (event) => {
+          if (event.lengthComputable) {
+            const percentLoaded = (event.loaded / event.total) * 100;
+            progressBar.style.width = percentLoaded + '%';
+          }
+        };
+        reader.onloadend = () => {
+          button.classList.remove('loading');
+          progressBar.style.width = '100%';
+          const fileData = reader.result;
+          saveInvoice(fileData);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    window.addEventListener('load', () => {
+      const loadingScreen = document.getElementById('loading-screen');
+      loadingScreen.classList.add('hidden');
+    });
+  </script>
+</body>
+</html> 
